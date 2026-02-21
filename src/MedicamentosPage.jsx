@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
+
 const MedicamentosPage = ({ studentsData }) => {
   // 4. Create internal state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -47,7 +49,22 @@ const MedicamentosPage = ({ studentsData }) => {
 
 
           <main style={styles.tableSection}>
-            <h2 style={styles.sectionTitle}>Listado de Medicamentos</h2>
+            
+            <div style={styles.titleContainer}>
+  {/* Botón a la izquierda */}
+  <button 
+    style={styles.actionButton}
+    onClick={() => setIsModalOpen(true)}
+  >
+    AGREGAR NUEVO MEDICAMENTO➕
+  </button>
+
+  <h2 style={styles.sectionTitle}>
+    Listado de Medicamentos
+  </h2>
+</div>
+{/* 2. The Emerging Form Dialog (Modal) */}
+
 
             <div style={styles.tableCard}>
               <div style={styles.scrollWrapper}>
@@ -117,6 +134,81 @@ const MedicamentosPage = ({ studentsData }) => {
         </div>
         <Footer />
       </div>
+      {/* POSICIÓN CORRECTA: Justo antes de cerrar el pageWrapper */}
+    {isModalOpen && (
+      <div style={styles.modalOverlay}>
+        <div style={styles.modalContent}>
+          <div style={styles.modalHeader}>
+            <h3>Nuevo Medicamento</h3>
+            <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
+          </div>
+          
+          <form style={styles.modalForm} onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+  
+  {/* Fila 1: Inputs Normales */}
+  <div style={styles.formRow}>
+    <div style={styles.inputGroup}>
+      <label style={styles.fieldLabel}>Subir foto Medicamento</label>
+      <input style={styles.modalInput} type="text" placeholder="Ej: Paracetamol" />
+    </div>
+    <div style={styles.inputGroup}>
+      <label style={styles.fieldLabel}>Descripción</label>
+      <input style={styles.modalInput} type="text" placeholder="Ej: 500mg" />
+    </div>
+  </div>
+
+  {/* Fila 2: Selectores de Imagen / Drag & Drop */}
+  <div style={styles.formRow}>
+    {/* Input 1: Traditional Button Style */}
+  <div style={styles.inputGroup}>
+    <label style={styles.fieldLabel}>Subir foto formula medica</label>
+    <div style={styles.fileButtonContainer}>
+      <input 
+        type="file" 
+        id="fileFrontal" 
+        style={{ display: 'none' }} 
+        accept="image/*,application/pdf" 
+      />
+      <label htmlFor="fileFrontal" style={styles.traditionalFileButton}>
+        📎 Seleccionar Archivo
+      </label>
+    </div>
+  </div>
+
+  {/* Input 2: Traditional Button Style */}
+  <div style={styles.inputGroup}>
+    <label style={styles.fieldLabel}>Documento Lateral</label>
+    <div style={styles.fileButtonContainer}>
+      <input 
+        type="file" 
+        id="fileLateral" 
+        style={{ display: 'none' }} 
+        accept="image/*,application/pdf" 
+      />
+      <label htmlFor="fileLateral" style={styles.traditionalFileButton}>
+        📎 Seleccionar Archivo
+      </label>
+    </div>
+  </div>
+  </div>
+
+  {/* Fila 3: Datepicker e Input Normal */}
+  <div style={styles.formRow}>
+    <div style={styles.inputGroup}>
+      <label style={styles.fieldLabel}>Configuración frecuencia</label>
+      <input style={styles.modalInput} type="datetime-local" />
+    </div>
+    <div style={styles.inputGroup}>
+      <label style={styles.fieldLabel}>Almacenamiento</label>
+      <input style={styles.modalInput} type="text" placeholder="Ej: L-4562" />
+    </div>
+  </div>
+
+  <button type="submit" style={styles.submitButton}>Registrar Medicamento</button>
+</form>
+        </div>
+      </div>
+    )}
     </div>
 
   );
@@ -442,6 +534,143 @@ rightContainer: {
     fontSize: '18px',
     filter: 'sepia(1) saturate(10000%) hue-rotate(345deg)', // This forces the emoji to look Red
     transition: 'transform 0.2s',
+  },
+  titleContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',           // Espacio entre el botón y el título
+    marginBottom: '24px',  // Espacio respecto a la tabla
+  },
+
+  sectionTitle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',           // Espacio entre avatar y texto
+    margin: 0,             // Quitamos el margen para que el container mande
+    fontFamily: "'Syne', sans-serif",
+    fontSize: '28px',
+    color: '#0A4D68',
+  },
+
+  actionButton: {
+    padding: '10px 20px',
+    backgroundColor: '#0A4D68',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    fontWeight: '700',
+    fontFamily: "'Syne', sans-serif",
+    transition: 'background 0.3s ease',
+    boxShadow: '0 4px 6px rgba(5, 195, 221, 0.2)',
+  },
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dims the background
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2000, // Stays above everything (Sidebar/Navbar)
+  },
+  modalContent: {
+    background: 'white',
+    padding: '30px',
+    borderRadius: '20px',
+    width: '600px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+    animation: 'emerge 0.3s ease-out', // You can add this @keyframes in your CSS
+  },
+  modalHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+  },
+  modalForm: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px',
+  },
+  modalInput: {
+    padding: '12px',
+    borderRadius: '10px',
+    border: '1px solid #e2e8f0',
+    fontSize: '15px',
+  },
+  closeButton: {
+    background: 'none',
+    border: 'none',
+    fontSize: '20px',
+    cursor: 'pointer',
+    color: '#64748b',
+  },
+  modalForm: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    marginTop: '10px',
+  },
+  formRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr', // Crea las 2 columnas iguales
+    gap: '15px',
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px',
+  },
+  fieldLabel: {
+    fontSize: '13px',
+    fontWeight: '700',
+    color: '#64748b',
+    marginLeft: '5px',
+  },
+  modalInput: {
+    padding: '12px',
+    borderRadius: '10px',
+    border: '2px solid #e2e8f0',
+    fontSize: '14px',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+  },
+  // Estilo para el área de Drag & Drop
+  dropZone: {
+    border: '2px dashed #cbd5e1',
+    borderRadius: '12px',
+    padding: '15px',
+    textAlign: 'center',
+    backgroundColor: '#f8fafc',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
+  dropLabel: {
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '5px',
+  },
+  dropText: {
+    fontSize: '11px',
+    color: '#94a3b8',
+    margin: 0,
+  },
+  submitButton: {
+    padding: '14px',
+    background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    cursor: 'pointer',
+    marginTop: '10px',
+    boxShadow: '0 4px 12px rgba(10, 77, 104, 0.2)',
   },
 };
 
