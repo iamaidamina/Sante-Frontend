@@ -1,0 +1,55 @@
+footer {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  /* REDUCED HEIGHT: From 40px to 15px */
+  padding: 15px 0 10px 0; 
+  background:#055882;
+  /* REMOVED the color property here so it doesn't mess with your icons */
+}
+
+footer .content {
+  max-width: 1350px;
+  margin: auto;
+  padding: 5px 20px; /* Reduced vertical padding */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* KEEPING YOUR WHITE ICONS EXACTLY AS THEY WERE */
+footer .content .media-icons a {
+  font-size: 16px;
+  height: 40px; /* Slightly smaller to save space */
+  width: 40px;
+  display: inline-block;
+  text-align: center;
+  line-height: 38px;
+  border-radius: 5px;
+  border: 2px solid #ffffff; /* Forced white border */
+  color: #ffffff !important; /* Forced white icon color */
+  margin: 10px 5px 0 0; /* REDUCED TOP MARGIN: From 30px to 10px */
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+footer .content .topic {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px; /* Reduced space under titles */
+}
+
+footer .content p {
+  text-align: justify;
+  padding-right: 30px; /* Reduced padding to keep text wider and shorter */
+  margin-bottom: 5px;
+}
+
+/* REDUCING EXTRA SPACES IN OTHER LINKS */
+footer .content .middle a {
+  line-height: 24px; /* From 32px to 24px */
+}
+
+footer .content .lower .topic {
+  margin: 10px 0 5px 0; /* Reduced top margin */
+}
