@@ -71,7 +71,7 @@ const CitasPage = ({ studentsData }) => {
                       >
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{student.name}</span>
+                            <span>{student.lugar}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>

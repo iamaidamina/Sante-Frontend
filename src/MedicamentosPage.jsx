@@ -87,7 +87,7 @@ const MedicamentosPage = ({ studentsData }) => {
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
                             <div style={styles.avatar}>{student.name.charAt(0)}</div>
-                            <span>{student.name}</span>
+                            <span>{student.medicamento}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
