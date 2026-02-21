@@ -1,0 +1,37 @@
+.navbar{
+    color: #ffffff;
+    background: #055882;
+    padding: 5px 10px;
+    border-radius: 0;
+    border: 9px solid #055882;
+    position: fixed;
+}
+
+.perfil{
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+}
+
+.imagen-logo{
+    margin-right: 10px;
+    border-radius: 0%;
+    width: 120px;
+    height: 36px;
+}
+
+.navbar-brand{
+    margin-left: 80px;
+    border-radius: 100%;
+}
+
+.navbar-collapse{
+    margin-right: 78px;
+}
+
+.navbar-dropdown{
+    position: relative;
+    
+}
+

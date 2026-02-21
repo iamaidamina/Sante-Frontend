@@ -22,12 +22,9 @@ const LoginPage = () => {
   const handleLogin = (e) => {
     e.preventDefault(); // This stops the "?" refresh
 
-    if (email === 'teacher@school.com' && password === 'demo123') {
-      setLoginError('');
-      navigate('/reportes'); // 6. Use navigate instead of setIsLoggedIn
-    } else {
-      setLoginError('Invalid credentials. Try teacher@school.com / demo123');
-    }
+  
+      navigate('/medicamentos'); // 6. Use navigate instead of setIsLoggedIn
+    
   };
 
   return (
