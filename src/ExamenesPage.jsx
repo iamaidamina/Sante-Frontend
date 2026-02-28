@@ -174,15 +174,36 @@ const ExamenesPage = ({ studentsData }) => {
 
                 {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Tipo</label>
-                  <Select
-                    options={[
-                      { value: 'periodica', label: 'Periodica' },
-                      { value: 'individual', label: 'Individual' }
-                    ]}
-                    value={selected}
-  onChange={(option) => setSelected(option)}  // Store full object
-                  />
+                  <label style={styles.fieldLabel}>Subir orden examen</label>
+                 <div style={styles.fileButtonContainer}>
+                    <input
+                      type="file"
+                      id="fileLateral"
+                      accept="image/*,application/pdf"
+                      style={{
+                        // Estilos para input visible y bonito
+                        width: '100%',
+                        height: '40px',
+                        padding: '8px 12px',
+                        border: '2px dashed #ccc',
+                        borderRadius: '8px',
+                        backgroundColor: '#f9f9f9',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          console.log('Archivo:', file.name, file.size);
+                          // Procesa tu archivo aquí
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.target.value = ''; // Limpia para permitir re-selección del mismo archivo
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
