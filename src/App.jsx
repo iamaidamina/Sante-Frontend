@@ -6,6 +6,7 @@ import MedicamentosPage from './MedicamentosPage';
 import EntregasPage from './EntregasPage';
 import CitasPage from './CitasPage';
 import ReportesPage from './ReportesPage';
+import ExamenesPage from './ExamenesPage';
 
 // Sample student data 
 const studentsData = [
@@ -58,6 +59,12 @@ export function App() {
           exact 
           path="/citas" 
           element={<CitasPage studentsData={studentsData} />} 
+        />
+
+        <Route 
+          exact 
+          path="/examenes" 
+          element={<ExamenesPage studentsData={studentsData} />} 
         />
 
         <Route 
