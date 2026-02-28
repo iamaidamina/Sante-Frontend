@@ -5,6 +5,9 @@
     border-radius: 0;
     border: 9px solid #055882;
     position: fixed;
+    width: 100%;
+  margin: 0;
+  padding: 0 1rem;
 }
 
 .perfil{
@@ -34,4 +37,10 @@
     position: relative;
     
 }
+
+.navbar-tam {
+  width: 100%;
+  padding: 0;
+}
+
 

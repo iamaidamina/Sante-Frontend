@@ -35,7 +35,7 @@ export default function BarraNavegacion() {
 
   return(
           <div className='navbar-tam'>
-          <Navbar className='navbar' variant='dark'>
+          <Navbar className='navbar' variant='dark' expand="lg" fluid>
               <Navbar.Brand className='navbar-brand' href="./">
                 <img className='imagen-logo' src={recurso1} alt='Logo' />
                 </Navbar.Brand>
