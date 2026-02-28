@@ -588,7 +588,7 @@ const styles = {
     gap: '180px',           // Espacio entre el botón y el título
     marginBottom: '24px',  // Espacio respecto a la tabla
   },
-
+  /*
   sectionTitle: {
     display: 'flex',
     alignItems: 'center',
@@ -598,7 +598,7 @@ const styles = {
     fontSize: '28px',
     color: '#0A4D68',
   },
-
+*/
   actionButton: {
     padding: '10px 20px',
     backgroundColor: '#0A4D68',
