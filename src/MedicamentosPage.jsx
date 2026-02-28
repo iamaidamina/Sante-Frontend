@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
-import {faPhoneVolume, faEnvelope, faEdit, faCancel, faPlus} from '@fortawesome/free-solid-svg-icons'
+import { faPhoneVolume, faEnvelope, faEdit, faCancel, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faFacebook, faInstagram, faYoutube} from '@fortawesome/free-brands-svg-icons'
+import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 
 const MedicamentosPage = ({ studentsData }) => {
@@ -42,16 +42,16 @@ const MedicamentosPage = ({ studentsData }) => {
 
 
       {/* Student Result  s Table */}
-      
+
       <Sidebar />
-      
-      
+
+
       {/* 2. mainContent llena el resto de la pantalla a la derecha */}
       {/* Contenedor de todo lo que va a la derecha del Sidebar */}
-       
+
       <div style={styles.rightContainer}>
         <div style={styles.navbarWrapper}>
-         <BarraNavegacion />
+          <BarraNavegacion />
         </div>
         <div style={styles.mainContent}>
 
@@ -64,7 +64,7 @@ const MedicamentosPage = ({ studentsData }) => {
                 style={styles.actionButton}
                 onClick={() => setIsModalOpen(true)}
               >
-                AGREGAR NUEVO MEDICAMENTO <FontAwesomeIcon icon={faPlus}/>
+                AGREGAR NUEVO MEDICAMENTO <FontAwesomeIcon icon={faPlus} />
               </button>
 
               <h2 style={styles.sectionTitle}>
@@ -119,15 +119,15 @@ const MedicamentosPage = ({ studentsData }) => {
                               style={styles.editEmoji}
                               onClick={() => console.log('Edit', student.id)}
                             >
-                               <FontAwesomeIcon icon={faEdit}/>
-                             
+                              <FontAwesomeIcon icon={faEdit} />
+
                             </span>
                             <span
                               title="Eliminar"
                               style={styles.deleteEmoji}
                               onClick={() => console.log('Delete', student.id)}
                             >
-                              <FontAwesomeIcon icon={faTrash}/>
+                              <FontAwesomeIcon icon={faTrash} />
                             </span>
                           </div>
                         </td>
@@ -156,7 +156,7 @@ const MedicamentosPage = ({ studentsData }) => {
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Subir foto Medicamento</label>
+                  <label style={styles.fieldLabel}>Nombre</label>
                   <input style={styles.modalInput} type="text" placeholder="Ej: Paracetamol" />
                 </div>
                 <div style={styles.inputGroup}>
@@ -173,30 +173,67 @@ const MedicamentosPage = ({ studentsData }) => {
                   <div style={styles.fileButtonContainer}>
                     <input
                       type="file"
-                      id="fileFrontal"
-                      style={{ display: 'none' }}
+                      id="fileLateral"
                       accept="image/*,application/pdf"
+                      style={{
+                        // Estilos para input visible y bonito
+                        width: '100%',
+                        height: '40px',
+                        padding: '8px 12px',
+                        border: '2px dashed #ccc',
+                        borderRadius: '8px',
+                        backgroundColor: '#f9f9f9',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          console.log('Archivo:', file.name, file.size);
+                          // Procesa tu archivo aquí
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.target.value = ''; // Limpia para permitir re-selección del mismo archivo
+                      }}
                     />
-                    <label htmlFor="fileFrontal" style={styles.traditionalFileButton}>
-                      📎 Seleccionar Archivo
-                    </label>
                   </div>
                 </div>
 
                 {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Documento Lateral</label>
+                  <label style={styles.fieldLabel}>Subir foto medicamento</label>
                   <div style={styles.fileButtonContainer}>
                     <input
                       type="file"
                       id="fileLateral"
-                      style={{ display: 'none' }}
                       accept="image/*,application/pdf"
+                      style={{
+                        // Estilos para input visible y bonito
+                        width: '100%',
+                        height: '40px',
+                        padding: '8px 12px',
+                        border: '2px dashed #ccc',
+                        borderRadius: '8px',
+                        backgroundColor: '#f9f9f9',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          console.log('Archivo:', file.name, file.size);
+                          // Procesa tu archivo aquí
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.target.value = ''; // Limpia para permitir re-selección del mismo archivo
+                      }}
                     />
-                    <label htmlFor="fileLateral" style={styles.traditionalFileButton}>
-                      📎 Seleccionar Archivo
-                    </label>
                   </div>
+
                 </div>
               </div>
 
