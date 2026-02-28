@@ -7,12 +7,14 @@ import { faPhoneVolume, faEnvelope, faEdit, faCancel, faPlus } from '@fortawesom
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
+import Select from 'react-select';
 const CitasPage = ({ studentsData }) => {
   // 4. Create internal state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selected, setSelected] = useState({ value: 'individual', label: 'Individual' });
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -144,7 +146,7 @@ const CitasPage = ({ studentsData }) => {
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
-              <h3>Nuevo Medicamento</h3>
+              <h3>Nueva Cita</h3>
               <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
             </div>
 
@@ -153,12 +155,12 @@ const CitasPage = ({ studentsData }) => {
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Nombre</label>
-                  <input style={styles.modalInput} type="text" placeholder="Ej: Paracetamol" />
+                  <label style={styles.fieldLabel}>Nombre medico</label>
+                  <input style={styles.modalInput} type="text" placeholder="medico" />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Descripción</label>
-                  <input style={styles.modalInput} type="text" placeholder="Ej: 500mg" />
+                  <label style={styles.fieldLabel}>Nombre especialidad</label>
+                  <input style={styles.modalInput} type="text" placeholder="especialidad" />
                 </div>
               </div>
 
@@ -166,87 +168,37 @@ const CitasPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Subir foto formula medica</label>
-                  <div style={styles.fileButtonContainer}>
-                    <input
-                      type="file"
-                      id="fileLateral"
-                      accept="image/*,application/pdf"
-                      style={{
-                        // Estilos para input visible y bonito
-                        width: '100%',
-                        height: '40px',
-                        padding: '8px 12px',
-                        border: '2px dashed #ccc',
-                        borderRadius: '8px',
-                        backgroundColor: '#f9f9f9',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          console.log('Archivo:', file.name, file.size);
-                          // Procesa tu archivo aquí
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.target.value = ''; // Limpia para permitir re-selección del mismo archivo
-                      }}
-                    />
-                  </div>
+                  <label style={styles.fieldLabel}>Descripción</label>
+                  <input style={styles.modalInput} type="text" placeholder="descripción" />
                 </div>
 
                 {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Subir foto medicamento</label>
-                  <div style={styles.fileButtonContainer}>
-                    <input
-                      type="file"
-                      id="fileLateral"
-                      accept="image/*,application/pdf"
-                      style={{
-                        // Estilos para input visible y bonito
-                        width: '100%',
-                        height: '40px',
-                        padding: '8px 12px',
-                        border: '2px dashed #ccc',
-                        borderRadius: '8px',
-                        backgroundColor: '#f9f9f9',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          console.log('Archivo:', file.name, file.size);
-                          // Procesa tu archivo aquí
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.target.value = ''; // Limpia para permitir re-selección del mismo archivo
-                      }}
-                    />
-                  </div>
-
+                  <label style={styles.fieldLabel}>Tipo</label>
+                  <Select
+                    options={[
+                      { value: 'periodica', label: 'Periodica' },
+                      { value: 'individual', label: 'Individual' }
+                    ]}
+                    value={selected}
+  onChange={(option) => setSelected(option)}  // Store full object
+                  />
                 </div>
               </div>
 
               {/* Fila 3: Datepicker e Input Normal */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Configuración frecuencia</label>
+                  <label style={styles.fieldLabel}>Fecha y hora</label>
                   <input style={styles.modalInput} type="datetime-local" />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Almacenamiento</label>
-                  <input style={styles.modalInput} type="text" placeholder="Ej: L-4562" />
+                  <label style={styles.fieldLabel}>Lugar</label>
+                  <input style={styles.modalInput} type="text" placeholder="lugar" />
                 </div>
               </div>
 
-              <button type="submit" style={styles.submitButton}>Registrar Medicamento</button>
+              <button type="submit" style={styles.submitButton}>Registrar Cita</button>
             </form>
           </div>
         </div>
@@ -529,7 +481,7 @@ const styles = {
     overflowX: 'auto',       // If table is too wide, it scrolls INTERNALLY
     maxHeight: '60vh',       // Optional: makes table height scrollable too
   },
-   actionButton: {
+  actionButton: {
     padding: '10px 20px',
     backgroundColor: '#0A4D68',
     color: 'white',
@@ -568,7 +520,7 @@ const styles = {
     zIndex: 100,    // Ensure it stays on top
   },
   */
-   titleContainer: {
+  titleContainer: {
     display: 'flex',
     alignItems: 'center',
     gap: '180px',           // Espacio entre el botón y el título
@@ -597,7 +549,7 @@ const styles = {
     filter: 'sepia(1) saturate(10000%) hue-rotate(345deg)', // This forces the emoji to look Red
     transition: 'transform 0.2s',
   },
-   modalOverlay: {
+  modalOverlay: {
     position: 'fixed',
     top: 0,
     left: 0,
@@ -636,7 +588,7 @@ const styles = {
     cursor: 'pointer',
     color: '#64748b',
   },
- modalForm: {
+  modalForm: {
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
