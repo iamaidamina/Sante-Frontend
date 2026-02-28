@@ -1,14 +1,60 @@
-import React, { useState } from 'react'; // 1. Added useState
+import React, { useState, useEffect, useRef } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
+import { faPhoneVolume, faEnvelope, faEdit, faCancel, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
+import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
+import Select from 'react-select';
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+
+function DraggableMap({ onLocationSelected }) {
+  const [position, setPosition] = useState([3.4216, -76.5205]); // Cali
+
+  function DraggableMarker() {
+    const map = useMapEvents({
+      click(e) {
+        setPosition(e.latlng);
+        onLocationSelected(e.latlng.lat, e.latlng.lng);
+      },
+    });
+    return <Marker position={position} />;
+  }
+
+  return (
+    <MapContainer
+      center={position}
+      zoom={14}
+      style={{ height: "300px", width: "100%" }}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+      />
+      <DraggableMarker />
+    </MapContainer>
+  );
+}
+
+
 const EntregasPage = ({ studentsData }) => {
   // 4. Create internal state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selected, setSelected] = useState({ value: 'thiago martínez', label: 'Thiago Martínez' });
   const navigate = useNavigate();
+
+  const [address, setAddress] = useState('');     // for "Lugar de entrega"
+  const [latLng, setLatLng] = useState(null);     // { lat, lng }
+
+  // ✅ Add refs here
+  const inputRef = useRef(null);    // for the autocomplete input
+  const mapRef = useRef(null);
 
   React.useEffect(() => {
     document.body.style.margin = '0';
@@ -41,13 +87,24 @@ const EntregasPage = ({ studentsData }) => {
       {/* Contenedor de todo lo que va a la derecha del Sidebar */}
       <div style={styles.rightContainer}>
         <div style={styles.navbarWrapper}>
-        <BarraNavegacion />
-      </div>
+          <BarraNavegacion />
+        </div>
         <div style={styles.mainContent}>
 
 
           <main style={styles.tableSection}>
-            <h2 style={styles.sectionTitle}>Listado de Entregas</h2>
+
+            <div style={styles.titleContainer}>
+              {/* Botón a la izquierda */}
+              <button
+                style={styles.actionButton}
+                onClick={() => setIsModalOpen(true)}
+              >
+                SOLICITAR NUEVA ENTREGA <FontAwesomeIcon icon={faPlus} />
+              </button>
+
+              <h2 style={styles.sectionTitle}>Listado de Entregas</h2>
+            </div>
 
             <div style={styles.tableCard}>
               <div style={styles.scrollWrapper}>
@@ -79,37 +136,37 @@ const EntregasPage = ({ studentsData }) => {
                           </span>
                         </td>
                         <td style={styles.tableCell}>
-                           <div style={styles.studentName}>
+                          <div style={styles.studentName}>
                             <span>{student.domiciliario}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
-                           <div style={styles.studentName}>
+                          <div style={styles.studentName}>
                             <span>{student.fecha}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
-                           <div style={styles.studentName}>
+                          <div style={styles.studentName}>
                             <span>{student.medicamento}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.actionGroup}>
-      <span 
-        title="Editar" 
-        style={styles.editEmoji} 
-        onClick={() => console.log('Edit', student.id)}
-      >
-        📝
-      </span>
-      <span 
-        title="Eliminar" 
-        style={styles.deleteEmoji} 
-        onClick={() => console.log('Delete', student.id)}
-      >
-        🗑️
-      </span>
-    </div>
+                            <span
+                              title="Editar"
+                              style={styles.editEmoji}
+                              onClick={() => console.log('Edit', student.id)}
+                            >
+                              <FontAwesomeIcon icon={faEdit} />
+                            </span>
+                            <span
+                              title="Eliminar"
+                              style={styles.deleteEmoji}
+                              onClick={() => console.log('Delete', student.id)}
+                            >
+                              <FontAwesomeIcon icon={faTrash} />
+                            </span>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -122,6 +179,81 @@ const EntregasPage = ({ studentsData }) => {
         </div>
         <Footer />
       </div>
+      {/* POSICIÓN CORRECTA: Justo antes de cerrar el pageWrapper */}
+      {isModalOpen && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <div style={styles.modalHeader}>
+              <h3>Solicitar Nueva Entrega</h3>
+              <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
+            </div>
+
+            <form style={styles.modalForm} onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+
+              {/* Fila 1: Inputs Normales */}
+              <div style={styles.formRow}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Nombre producto</label>
+                  <input style={styles.modalInput} type="text" placeholder="producto" />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Lugar de compra</label>
+                  <input style={styles.modalInput} type="text" placeholder="lugar" />
+                </div>
+              </div>
+
+              {/* Fila 2: Selectores de Imagen / Drag & Drop */}
+              <div style={styles.formRow}>
+                {/* Input 1: Traditional Button Style */}
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Fecha y hora</label>
+                  <input style={styles.modalInput} type="datetime-local" />
+                  <DraggableMap
+                    onLocationSelected={(lat, lng) => {
+                      setLatLng({ lat, lng });
+                      setAddress(`(${lat.toFixed(6)}, ${lng.toFixed(6)})`);
+                    }}
+                  />
+                </div>
+
+                {/* Input 2: Traditional Button Style */}
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Nombre domiciliario</label>
+                  <Select
+                    options={[
+                      { value: 'valentina rojas', label: 'Valentina Rojas' },
+                      { value: 'thiago martínez', label: 'Thiago Martínez' },
+                      { value: 'damián vega', label: 'Damián Vega' },
+                      { value: 'zoe morales', label: 'Zoe Morales' },
+                      { value: 'abril mendoza', label: 'Abril Mendoza' },
+                      { value: 'julieta paredes', label: 'Julieta Paredes' },
+                    ]}
+                    value={selected}
+                    onChange={(option) => setSelected(option)}  // Store full object
+                  />
+                </div>
+              </div>
+
+              {/* Fila 3: Datepicker e Input Normal */}
+              <div style={styles.formRow}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Lugar de entrega</label>
+                  <input
+                    ref={inputRef}
+                    style={styles.modalInput}
+                    type="text"
+                    placeholder="lugar"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <button type="submit" style={styles.submitButton}>Registrar Solicitud Entrega</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
 
   );
@@ -129,7 +261,7 @@ const EntregasPage = ({ studentsData }) => {
 
 const styles = {
   // ... (previous styles remain the same)
-rightContainer: {
+  rightContainer: {
     gridColumn: '2',         // Forces this to stay in the second column
     display: 'flex',
     flexDirection: 'column',
@@ -237,7 +369,7 @@ rightContainer: {
   pageWrapper: {
     display: 'grid',
     // Column 1: Sidebar width | Column 2: The rest of the screen
-    gridTemplateColumns: '190px 1fr', 
+    gridTemplateColumns: '0px 1fr',
     minHeight: '100vh',
     width: '100vw',
     margin: 0,
@@ -267,7 +399,7 @@ rightContainer: {
     height: 'auto',
   },
   tableSection: {
-    padding: '40px',
+    padding: '100px 100px 70px 190px',
     width: '100%',
     boxSizing: 'border-box',
   },
@@ -421,9 +553,29 @@ rightContainer: {
     backgroundColor: '#f8fafc', // Fondo sólido para que no se vea el texto de abajo
     borderBottom: '2px solid #e2e8f0',
   },
+  /*
   navbarWrapper: {
     width: '100%',  // Force the navbar to stretch
     zIndex: 100,    // Ensure it stays on top
+  },
+  */
+  actionButton: {
+    padding: '10px 20px',
+    backgroundColor: '#0A4D68',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    fontWeight: '700',
+    fontFamily: "'Syne', sans-serif",
+    transition: 'background 0.3s ease',
+    boxShadow: '0 4px 6px rgba(5, 195, 221, 0.2)',
+  },
+  titleContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '180px',           // Espacio entre el botón y el título
+    marginBottom: '24px',  // Espacio respecto a la tabla
   },
   scoreCell: {
     display: 'flex',
@@ -447,6 +599,109 @@ rightContainer: {
     fontSize: '18px',
     filter: 'sepia(1) saturate(10000%) hue-rotate(345deg)', // This forces the emoji to look Red
     transition: 'transform 0.2s',
+  },
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dims the background
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2000, // Stays above everything (Sidebar/Navbar)
+  },
+  modalContent: {
+    background: 'white',
+    padding: '30px',
+    borderRadius: '20px',
+    width: '600px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+    animation: 'emerge 0.3s ease-out', // You can add this @keyframes in your CSS
+  },
+  modalHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+  },
+  modalInput: {
+    padding: '12px',
+    borderRadius: '10px',
+    border: '1px solid #e2e8f0',
+    fontSize: '15px',
+  },
+  closeButton: {
+    background: 'none',
+    border: 'none',
+    fontSize: '20px',
+    cursor: 'pointer',
+    color: '#64748b',
+  },
+  modalForm: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    marginTop: '10px',
+  },
+  formRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr', // Crea las 2 columnas iguales
+    gap: '15px',
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px',
+  },
+  fieldLabel: {
+    fontSize: '13px',
+    fontWeight: '700',
+    color: '#64748b',
+    marginLeft: '5px',
+  },
+  modalInput: {
+    padding: '12px',
+    borderRadius: '10px',
+    border: '2px solid #e2e8f0',
+    fontSize: '14px',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+  },
+  // Estilo para el área de Drag & Drop
+  dropZone: {
+    border: '2px dashed #cbd5e1',
+    borderRadius: '12px',
+    padding: '15px',
+    textAlign: 'center',
+    backgroundColor: '#f8fafc',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
+  dropLabel: {
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '5px',
+  },
+  dropText: {
+    fontSize: '11px',
+    color: '#94a3b8',
+    margin: 0,
+  },
+  submitButton: {
+    padding: '14px',
+    background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    cursor: 'pointer',
+    marginTop: '10px',
+    boxShadow: '0 4px 12px rgba(10, 77, 104, 0.2)',
   },
 };
 

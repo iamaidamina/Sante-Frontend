@@ -78,7 +78,7 @@ const MedicamentosPage = ({ studentsData }) => {
                 <table style={styles.table}>
                   <thead style={styles.stickyHeader}>
                     <tr style={styles.tableHeaderRow}>
-                      <th style={styles.tableHeader}>Nombre</th>
+                      <th style={styles.tableHeader}>Nombre Medicamento</th>
                       <th style={styles.tableHeader}>Estado</th>
                       <th style={styles.tableHeader}>Frecuencia</th>
                       <th style={styles.tableHeader}>Almacenamiento</th>
