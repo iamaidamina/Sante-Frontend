@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
+import {faPhoneVolume, faEnvelope, faEdit, faCancel, faPlus} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faFacebook, faInstagram, faYoutube} from '@fortawesome/free-brands-svg-icons'
+import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 
 const MedicamentosPage = ({ studentsData }) => {
   // 4. Create internal state
@@ -34,16 +38,185 @@ const MedicamentosPage = ({ studentsData }) => {
   };
 
   return (
-    
     <div style={styles.pageWrapper} className="pageWrapper">
 
 
       {/* Student Result  s Table */}
-      <BarraNavegacion />
+      
       <Sidebar />
       
-     <Footer />
-     
+      
+      {/* 2. mainContent llena el resto de la pantalla a la derecha */}
+      {/* Contenedor de todo lo que va a la derecha del Sidebar */}
+       
+      <div style={styles.rightContainer}>
+        <div style={styles.navbarWrapper}>
+         <BarraNavegacion />
+        </div>
+        <div style={styles.mainContent}>
+
+
+          <main style={styles.tableSection}>
+
+            <div style={styles.titleContainer}>
+              {/* Botón a la izquierda */}
+              <button
+                style={styles.actionButton}
+                onClick={() => setIsModalOpen(true)}
+              >
+                AGREGAR NUEVO MEDICAMENTO <FontAwesomeIcon icon={faPlus}/>
+              </button>
+
+              <h2 style={styles.sectionTitle}>
+                Listado de Medicamentos
+              </h2>
+            </div>
+
+
+            <div style={styles.tableCard}>
+              <div style={styles.scrollWrapper}>
+                <table style={styles.table}>
+                  <thead style={styles.stickyHeader}>
+                    <tr style={styles.tableHeaderRow}>
+                      <th style={styles.tableHeader}>Nombre</th>
+                      <th style={styles.tableHeader}>Estado</th>
+                      <th style={styles.tableHeader}>Frecuencia</th>
+                      <th style={styles.tableHeader}>Almacenamiento</th>
+                      <th style={styles.tableHeader}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {studentsData.map((student, index) => (
+                      <tr
+                        key={student.id}
+                        style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
+                      >
+                        <td style={styles.tableCell}>
+                          <div style={styles.studentName}>
+                            <div style={styles.avatar}>{student.medicamento.charAt(0)}</div>
+                            <span>{student.medicamento}</span>
+                          </div>
+                        </td>
+                        <td style={styles.tableCell}>
+                          <span style={student.gender === 'Inactivo' ? styles.badgeMale : styles.badgeFemale}>
+                            {student.gender}
+                          </span>
+                        </td>
+                        <td style={styles.tableCell}>
+                          <div style={styles.studentName}>
+                            <span>{student.frecuencia}</span>
+                          </div>
+                        </td>
+                        <td style={styles.tableCell}>
+                          <div style={styles.studentName}>
+                            <span>{student.almacenamiento}</span>
+                          </div>
+                        </td>
+                        <td style={styles.tableCell}>
+                          <div style={styles.actionGroup}>
+                            <span
+                              title="Editar"
+                              style={styles.editEmoji}
+                              onClick={() => console.log('Edit', student.id)}
+                            >
+                               <FontAwesomeIcon icon={faEdit}/>
+                             
+                            </span>
+                            <span
+                              title="Eliminar"
+                              style={styles.deleteEmoji}
+                              onClick={() => console.log('Delete', student.id)}
+                            >
+                              <FontAwesomeIcon icon={faTrash}/>
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </main>
+
+        </div>
+        <Footer />
+      </div>
+      {/* POSICIÓN CORRECTA: Justo antes de cerrar el pageWrapper */}
+      {isModalOpen && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <div style={styles.modalHeader}>
+              <h3>Nuevo Medicamento</h3>
+              <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
+            </div>
+
+            <form style={styles.modalForm} onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+
+              {/* Fila 1: Inputs Normales */}
+              <div style={styles.formRow}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Subir foto Medicamento</label>
+                  <input style={styles.modalInput} type="text" placeholder="Ej: Paracetamol" />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Descripción</label>
+                  <input style={styles.modalInput} type="text" placeholder="Ej: 500mg" />
+                </div>
+              </div>
+
+              {/* Fila 2: Selectores de Imagen / Drag & Drop */}
+              <div style={styles.formRow}>
+                {/* Input 1: Traditional Button Style */}
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Subir foto formula medica</label>
+                  <div style={styles.fileButtonContainer}>
+                    <input
+                      type="file"
+                      id="fileFrontal"
+                      style={{ display: 'none' }}
+                      accept="image/*,application/pdf"
+                    />
+                    <label htmlFor="fileFrontal" style={styles.traditionalFileButton}>
+                      📎 Seleccionar Archivo
+                    </label>
+                  </div>
+                </div>
+
+                {/* Input 2: Traditional Button Style */}
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Documento Lateral</label>
+                  <div style={styles.fileButtonContainer}>
+                    <input
+                      type="file"
+                      id="fileLateral"
+                      style={{ display: 'none' }}
+                      accept="image/*,application/pdf"
+                    />
+                    <label htmlFor="fileLateral" style={styles.traditionalFileButton}>
+                      📎 Seleccionar Archivo
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fila 3: Datepicker e Input Normal */}
+              <div style={styles.formRow}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Configuración frecuencia</label>
+                  <input style={styles.modalInput} type="datetime-local" />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Almacenamiento</label>
+                  <input style={styles.modalInput} type="text" placeholder="Ej: L-4562" />
+                </div>
+              </div>
+
+              <button type="submit" style={styles.submitButton}>Registrar Medicamento</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
 
   );
@@ -159,7 +332,7 @@ const styles = {
   pageWrapper: {
     display: 'grid',
     // Column 1: Sidebar width | Column 2: The rest of the screen
-    gridTemplateColumns: '190px 1fr',
+    gridTemplateColumns: '0px 1fr',
     minHeight: '100vh',
     width: '100vw',
     margin: 0,
@@ -189,7 +362,7 @@ const styles = {
     height: 'auto',
   },
   tableSection: {
-    padding: '40px',
+    padding: '100px 100px 70px 190px',
     width: '100%',
     boxSizing: 'border-box',
   },
@@ -343,10 +516,12 @@ const styles = {
     backgroundColor: '#f8fafc', // Fondo sólido para que no se vea el texto de abajo
     borderBottom: '2px solid #e2e8f0',
   },
+  /*
   navbarWrapper: {
     width: '100%',  // Force the navbar to stretch
     zIndex: 100,    // Ensure it stays on top
   },
+  */
   scoreCell: {
     display: 'flex',
     alignItems: 'center',
@@ -373,7 +548,7 @@ const styles = {
   titleContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '20px',           // Espacio entre el botón y el título
+    gap: '180px',           // Espacio entre el botón y el título
     marginBottom: '24px',  // Espacio respecto a la tabla
   },
 
