@@ -8,6 +8,10 @@ import CitasPage from './CitasPage';
 import ReportesPage from './ReportesPage';
 import ExamenesPage from './ExamenesPage';
 
+import { io } from 'socket.io-client';
+import {useEffect} from 'react';
+
+const socket = io('https://sante-backend-production.up.railway.app'); // Connect to the Socket.IO server
 // Sample student data 
 const studentsData = [
   { id: 1,concepto:"Furosemida 40 mg",medicamento: "Losartán 50 mg",domiciliario:"Valentina Rojas",compra:"Drogueria San Jorge",fecha: 'Martes, 14 de Marzo del 2026',profesional: 'Andrés Vargas',especialidad: 'Cardiología',lugar: 'Clinica Imbanaco',name: 'Ana Rodríguez', gender: 'Activo',estado: 'Pendiente', frecuencia: '2:00',almacenamiento: 'Cajón Habitación',problemSolving: 85, criticalThinking: 92, creativity: 78, overall: 85 },
@@ -33,6 +37,18 @@ export function App() {
     bodyStyle.margin = bodyStyle.padding = '0';
     bodyStyle.height = bodyStyle.width = '100%';
     bodyStyle.overflowX = 'hidden';
+  }, []);
+
+  useEffect(() => {
+
+    socket.on("alerta_uv", (data) => {
+      alert(data.mensaje + " UV: " + data.valor);
+    });
+
+    return () => {
+      socket.off("alerta_uv");
+    };
+
   }, []);
 
   return (
