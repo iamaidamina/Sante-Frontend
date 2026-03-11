@@ -4,9 +4,14 @@ import Footer from './components/general-components/Footer';
 import illustrationRight from './assets/illustrationRight.svg'
 const RegistrationPage = () => {
   // 4. Create internal state
-  const [email, setEmail] = useState('');
+  const [nombres, setNombres] = useState('');
+  const [apellidos, setApellidos] = useState('');
+  const [fechaNacimiento, setFechaNacimiento] = useState('2026-03-11');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
+  const [email, setEmail] = useState('');
+  const [registerError, setRegisterError] = useState(''); // Cambia loginError por registerError
+  const [registerSuccess, setRegisterSuccess] = useState(false);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -18,14 +23,39 @@ const RegistrationPage = () => {
     };
   }, []);
 
-  // 5. Create internal handleLogin
-  const handleLogin = (e) => {
-    e.preventDefault(); // This stops the "?" refresh
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
-    
-      navigate('/'); // 6. Use navigate instead of setIsLoggedIn
-    
+    const data = {
+      nombres,
+      apellidos,
+      fecha_nacimiento: fechaNacimiento,
+      username,
+      email,
+      password
+    };
+
+    try {
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        setRegisterSuccess(true);
+        navigate('/'); // O a login si prefieres
+      } else {
+        const errorData = await response.json();
+        setRegisterError(errorData.message || 'Error en registro');
+      }
+    } catch (error) {
+      setRegisterError('Error de conexión');
+    }
   };
+
 
   return (
     <div style={styles.pageWrapper} className="pageWrapper">
@@ -62,63 +92,100 @@ const RegistrationPage = () => {
 
             {/* START: Gradient Border Frame */}
             <div style={styles.gradientFrame}>
-              <form onSubmit={handleLogin} style={styles.loginForm}>
-  {/* Fila 1: Usuario y Email */}
-  <div style={styles.row}>
-    <div style={styles.inputGroupHalf}>
-      <label style={styles.label}>Nombres</label>
-      <input type="text" placeholder="Nombre de usuario" style={styles.input} required />
-    </div>
-    <div style={styles.inputGroupHalf}>
-      <label style={styles.label}>Apellidos</label>
-      <input type="text" placeholder="Apellido de usuario" style={styles.input} required />
-    </div>
-  </div>
+              <form onSubmit={handleRegister} style={styles.loginForm}>
+                {/* Fila 1: Usuario y Email */}
+                <div style={styles.row}>
+                  <div style={styles.inputGroupHalf}>
+                    <label style={styles.label}>Nombres</label>
+                    <input
+                      type="text"
+                      placeholder="Nombre de usuario"
+                      value={nombres}
+                      onChange={(e) => setNombres(e.target.value)}
+                      style={styles.input}
+                      required />
+                  </div>
+                  <div style={styles.inputGroupHalf}>
+                    <label style={styles.label}>Apellidos</label>
+                    <input
+                      type="text"
+                      placeholder="Apellido de usuario"
+                      value={apellidos}
+                      onChange={(e) => setApellidos(e.target.value)}
+                      style={styles.input}
+                      required />
+                  </div>
+                </div>
 
-  {/* NUEVA FILA: Fecha de Nacimiento (Ocupa el centro) */}
-  <div style={styles.row}>
-    <div style={styles.inputGroupHalf}>
-      <label style={styles.label}>Fecha de Nacimiento</label>
-      <input 
-        type="date" 
-        style={styles.input} 
-        required 
-      />
-    </div>
-    <div style={styles.inputGroupHalf}>
-      <label style={styles.label}>Email</label>
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ejemplo@correo.com" style={styles.input} required />
-    </div>
-  </div>
+                {/* NUEVA FILA: Fecha de Nacimiento (Ocupa el centro) */}
+                <div style={styles.row}>
+                  <div style={styles.inputGroupHalf}>
+                    <label style={styles.label}>Fecha de Nacimiento</label>
+                    <input
+                      type="date"
+                      value={fechaNacimiento}
+                      onChange={(e) => setFechaNacimiento(e.target.value)}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
+                  <div style={styles.inputGroupHalf}>
+                    <label style={styles.label}>Email</label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="ejemplo@correo.com"
+                      style={styles.input} required />
+                  </div>
+                </div>
 
-  {/* Fila 3: Usuario y Contraseña */}
-  <div style={styles.row}>
-    <div style={styles.inputGroupHalf}>
-      <label style={styles.label}>Usuario</label>
-      <input type="input"  placeholder="Usuario" style={styles.input} required />
-    </div>
-    <div style={styles.inputGroupHalf}>
-      <label style={styles.label}>Contraseña</label>
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" style={styles.input} required  />
-    </div>
-  </div>
+                {/* Fila 3: Usuario y Contraseña */}
+                <div style={styles.row}>
+                  <div style={styles.inputGroupHalf}>
+                    <label style={styles.label}>Usuario</label>
+                    <input type="input"
+                      placeholder="Usuario"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      style={styles.input} required />
+                  </div>
+                  <div style={styles.inputGroupHalf}>
+                    <label style={styles.label}>Contraseña</label>
+                    <input type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="********" style={styles.input} required />
+                  </div>
+                </div>
 
-  {/* Checkbox: Términos y Condiciones */}
-  <div style={styles.checkboxContainer}>
-    <input type="checkbox" id="terms" style={styles.checkbox} required />
-    <label htmlFor="terms" style={styles.checkboxLabel}>
-      He leído y acepto los <a href="#terms" style={styles.termsLink}>términos y condiciones</a>
-    </label>
-  </div>
+                {/* Checkbox: Términos y Condiciones */}
+                <div style={styles.checkboxContainer}>
+                  <input type="checkbox" id="terms" style={styles.checkbox} required />
+                  <label htmlFor="terms" style={styles.checkboxLabel}>
+                    He leído y acepto los <a href="#terms" style={styles.termsLink}>términos y condiciones</a>
+                  </label>
+                </div>
 
-  {loginError && <div style={styles.errorMessage}>{loginError}</div>}
+                {registerError && <div style={styles.errorMessage}>{registerError}</div>}
+                {/* ÉXITO - Verde */}
+                {registerSuccess && (
+                  <div style={{
+                    ...styles.errorMessage,
+                    background: '#d1fae5',
+                    color: '#065f46',
+                    border: '1px solid #a7f3d0'
+                  }}>
+                    ¡Usuario registrado exitosamente!
+                  </div>
+                )}
 
-  <div style={styles.buttonWrapper}>
-    <button type="submit" style={styles.loginButton}>
-      Registrarse {/*<span style={styles.buttonArrow}>→</span>*/}
-    </button>
-  </div>
-</form>
+                <div style={styles.buttonWrapper}>
+                  <button type="submit" style={styles.loginButton}>
+                    Registrarse {/*<span style={styles.buttonArrow}>→</span>*/}
+                  </button>
+                </div>
+              </form>
             </div>
             {/* END: Gradient Border Frame */}
 
