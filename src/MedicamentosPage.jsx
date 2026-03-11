@@ -18,9 +18,12 @@ const MedicamentosPage = () => {
   const [newMedication, setNewMedication] = useState({
     nombre: '',
     descripcion: '',
-    id_frecuencia: '',
+    id_frecuencia: null,
     almacenamiento: ''
   });
+
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingMedication, setEditingMedication] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,11 +34,11 @@ const MedicamentosPage = () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-       if (!token) {
-      setError('No token found. Please login again.');
-      setIsLoading(false);
-      return;
-    }
+      if (!token) {
+        setError('No token found. Please login again.');
+        setIsLoading(false);
+        return;
+      }
 
       const response = await fetch('https://sante-backend-production.up.railway.app/api/medications', {
         method: 'GET',
@@ -61,10 +64,10 @@ const MedicamentosPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    console.log('🛠️ Creating:', newMedication);
     try {
       const token = localStorage.getItem('token');
-      
+
       const response = await fetch('https://sante-backend-production.up.railway.app/api/medications', {
         method: 'POST',
         headers: {
@@ -75,7 +78,7 @@ const MedicamentosPage = () => {
       });
 
       if (response.ok) {
-        setNewMedication({ nombre: '', descripcion: '', id_frecuencia: '', almacenamiento: '' });
+        setNewMedication({ nombre: '', descripcion: '', id_frecuencia: null, almacenamiento: '' });
         setIsModalOpen(false);
         fetchMedications(); // Refresh list
       } else {
@@ -88,23 +91,79 @@ const MedicamentosPage = () => {
 
   const handleDelete = async (id) => {
     if (!confirm('¿Eliminar este medicamento?')) return;
-    
+
     try {
       const token = localStorage.getItem('token');
-      
+
       await fetch(`https://sante-backend-production.up.railway.app/api/medications/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       fetchMedications(); // Refresh list
     } catch (error) {
       alert('Error al eliminar');
     }
   };
-   // ✅ Now safe to return early
+
+  const handleEdit = (id, medication) => {
+    /*
+    setEditingMedication({ ...medication, id_medicamento: id });
+    setIsEditMode(true);
+    setIsModalOpen(true);  // ← THIS OPENS MODAL
+    */
+   const cleanMedication = {
+    id_medicamento: id,
+    nombre: medication.nombre || '',
+    descripcion: medication.descripcion || '',
+   id_frecuencia: medication.id_frecuencia ? parseInt(medication.id_frecuencia, 10) : 1,
+    almacenamiento: medication.almacenamiento || '',
+    estado: medication.estado || 'activo'
+  };
+  
+  setEditingMedication(cleanMedication);
+  setIsEditMode(true);
+  setIsModalOpen(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!editingMedication) {
+      alert('No medication selected for editing');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(
+        `https://sante-backend-production.up.railway.app/api/medications/${editingMedication.id_medicamento}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(editingMedication),
+        }
+      );
+
+      if (response.ok) {
+        setIsEditMode(false);
+        setEditingMedication(null);
+        setIsModalOpen(false);
+        fetchMedications(); // Refresh list
+      } else {
+        alert('Error al actualizar');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+  // ✅ Now safe to return early
   if (isLoading) {
     return (
       <div style={styles.pageWrapper}>
@@ -176,7 +235,7 @@ const MedicamentosPage = () => {
                       <th style={styles.tableHeader}>Acciones</th>
                     </tr>
                   </thead>
-                       <tbody>
+                  <tbody>
                     {medications.length === 0 ? (
                       <tr>
                         <td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
@@ -201,7 +260,7 @@ const MedicamentosPage = () => {
                           <td style={styles.tableCell}>{medication.almacenamiento || 'N/A'}</td>
                           <td style={styles.tableCell}>
                             <div style={styles.actionGroup}>
-                              <span style={styles.editEmoji} title="Editar" onClick={() => console.log('Edit', medication.id_medicamento)}>
+                              <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(medication.id_medicamento, medication)}>
                                 <FontAwesomeIcon icon={faEdit} />
                               </span>
                               <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(medication.id_medicamento)}>
@@ -226,29 +285,47 @@ const MedicamentosPage = () => {
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
-              <h3>Nuevo Medicamento</h3>
-              <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
+              <h3>{isEditMode ? 'Editar Medicamento' : 'Nuevo Medicamento'}</h3>
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setIsEditMode(false);
+                  setEditingMedication(null);
+                }}
+                style={styles.closeButton}>✕</button>
             </div>
 
-            <form style={styles.modalForm} onSubmit={handleSubmit}>
+            <form style={styles.modalForm} onSubmit={isEditMode ? handleUpdate : handleSubmit}>
 
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre</label>
-                  <input style={styles.modalInput} 
-                  type="text" 
-                  placeholder="Ej: Paracetamol" 
-                  value={newMedication.nombre}
-                  onChange={(e) => setNewMedication({...newMedication, nombre: e.target.value})}/>
+                  <input style={styles.modalInput}
+                    type="text"
+                    placeholder="Ej: Paracetamol"
+                    value={isEditMode ? editingMedication.nombre : newMedication.nombre}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingMedication({ ...editingMedication, nombre: e.target.value });
+                      } else {
+                        setNewMedication({ ...newMedication, nombre: e.target.value });
+                      }
+                    }} />
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Descripción</label>
-                  <input style={styles.modalInput} 
-                  type="text" 
-                  placeholder="Ej: 500mg"
-                  value={newMedication.nombre}
-                  onChange={(e) => setNewMedication({...newMedication, nombre: e.target.value})} />
+                  <input style={styles.modalInput}
+                    type="text"
+                    placeholder="Ej: 500mg"
+                    value={isEditMode ? editingMedication.descripcion : newMedication.descripcion}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingMedication({ ...editingMedication, descripcion: e.target.value });
+                      } else {
+                        setNewMedication({ ...newMedication, descripcion: e.target.value });
+                      }
+                    }} />
                 </div>
               </div>
 
@@ -328,24 +405,38 @@ const MedicamentosPage = () => {
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Configuración frecuencia</label>
-                  <input style={styles.modalInput} 
-                  type="number"
-                   value={newMedication.id_frecuencia}
-                    onChange={(e) => setNewMedication({...newMedication, id_frecuencia: e.target.value})}
-                   />
+                  <input style={styles.modalInput}
+                    type="number"
+                    value={isEditMode ? editingMedication.id_frecuencia : newMedication.id_frecuencia}
+                    onChange={(e) => {
+                      const numberValue = e.target.value === '' ? '' : parseInt(e.target.value, 10);
+                      if (isEditMode) {
+                        setEditingMedication({ ...editingMedication, id_frecuencia: numberValue });
+                      } else {
+                        setNewMedication({ ...newMedication, id_frecuencia: numberValue });
+                      }
+                    }}
+                  />
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Almacenamiento</label>
-                  <input style={styles.modalInput} 
-                  type="text" 
-                  placeholder="Ej: L-4562"
-                  value={newMedication.almacenamiento}
-                  onChange={(e) => setNewMedication({...newMedication, almacenamiento: e.target.value})} />
+                  <input style={styles.modalInput}
+                    type="text"
+                    placeholder="Ej: L-4562"
+                    value={isEditMode ? editingMedication.almacenamiento : newMedication.almacenamiento}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingMedication({ ...editingMedication, almacenamiento: e.target.value });
+                      } else {
+                        setNewMedication({ ...newMedication, almacenamiento: e.target.value });
+                      }
+                    }} />
                 </div>
               </div>
 
-              <button type="submit" style={styles.submitButton}
-              >Registrar Medicamento</button>
+              <button type="submit" style={styles.submitButton}>
+                {isEditMode ? 'Actualizar Medicamento' : 'Registrar Medicamento'}
+              </button>
             </form>
           </div>
         </div>
