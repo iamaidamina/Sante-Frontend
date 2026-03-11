@@ -6,7 +6,7 @@ import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/general-components/navbarMenuPrincipal.css';
 import Cookies from 'universal-cookie';
 import user from '../../assets/react.svg';
-import recurso1 from '../../assets/react.svg';
+import recurso1 from '../../assets/Logo-sante-sinfondo.svg';
 
 export default function BarraNavegacion() {
   const cookies = new Cookies();
@@ -36,24 +36,34 @@ export default function BarraNavegacion() {
     <div className='navbar-tam'>
       <Navbar className='navbar' variant='dark' expand="lg" fluid>
         <Navbar.Brand className='navbar-brand' href="/">
-          <img className='imagen-logo' src={recurso1} alt='Logo' />
+          <img
+            className='imagen-logo'
+            src={recurso1}
+            alt='Logo'
+            style={{
+              maxWidth: '30%',
+              height: 'auto',
+              objectFit: 'contain'
+            }}
+          />
+
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse className='justify-content-end navbar-collapse' id="basic-navbar-nav">
           <Nav>
             <img src={user} className="avatar perfil" alt="Avatar" />
-            <NavDropdown 
+            <NavDropdown
               title={username}
-              id="basic-nav-dropdown" 
+              id="basic-nav-dropdown"
               className='justify-content-end'
             >
               <NavDropdown.Item className='dropdown-item navbar-dropdown'>
-                <Button 
-                  variant="light" 
+                <Button
+                  variant="light"
                   type="button"
                   onClick={cerrarSesion}
                 >
-                  <FontAwesomeIcon icon={faSignOutAlt}/>
+                  <FontAwesomeIcon icon={faSignOutAlt} />
                   &nbsp;&nbsp;Cerrar Sesión
                 </Button>
               </NavDropdown.Item>
