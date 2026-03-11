@@ -47,6 +47,7 @@ const LoginPage = () => {
       if (response.ok) {
         // Guarda el token en localStorage
         localStorage.setItem('token', result.token);
+        localStorage.setItem('email', email);
         navigate('/medicamentos');
       } else {
         setLoginError(result.message || 'Error en login');

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ FIXED: Import useNavigate
 import { Navbar, Nav, NavDropdown, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
@@ -8,55 +9,58 @@ import user from '../../assets/react.svg';
 import recurso1 from '../../assets/react.svg';
 
 export default function BarraNavegacion() {
-
   const cookies = new Cookies();
-  const cookies2 = new Cookies();
+  const navigate = useNavigate(); // ✅ FIXED: Now works with import
+  const token = localStorage.getItem('token'); // ✅ Use localStorage like login
+  const username = cookies.get('username') || localStorage.getItem('email') || 'Usuario';
 
-  //Se usa useEffect para permitir que la función se siga ejecutando, en este caso, la funcion que hace
-  //que persista la ventana de menu principal en caso de que se mantenga la sesión
-  /*
   useEffect(() => {
-    const cookies = new Cookies();
-    if(!cookies.get('token')){
-      window.location.assign('./');
-  }
-  }, []);
-  */
+    if (!token) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate, token]); // ✅ Added token dependency
 
-  //Elimina el token de las cookies para dejar de mantener el inicio de sesión
   const cerrarSesion = () => {
-    cookies.remove('token', {path:'/'});
-    window.location.assign('./');
-  }
+    // ✅ Clean BOTH storage methods for consistency
+    cookies.remove('token', { path: '/' });
+    cookies.remove('username', { path: '/' });
+    localStorage.removeItem('token');
+    localStorage.removeItem('email'); // If you store email here too
+    navigate('/', { replace: true });
+  };
 
-  const email = cookies2.get('email');
+  // ✅ Show loading/protected state
+  if (!token) return null;
 
-  console.log('cookie', email);
-
-  return(
-          <div className='navbar-tam'>
-          <Navbar className='navbar' variant='dark' expand="lg" fluid>
-              <Navbar.Brand className='navbar-brand' href="./">
-                <img className='imagen-logo' src={recurso1} alt='Logo' />
-                </Navbar.Brand>
-              <Navbar.Toggle aria-controls="basic-navbar-nav" />
-              <Navbar.Collapse className='justify-content-end navbar-collapse' id="basic-navbar-nav">
-                <Nav>
-                <img src={user} className="avatar perfil" alt="Avatar" />
-                {/* title={`${email}`} */}
-                  <NavDropdown title={`Usuario`} id="basic-nav-dropdown" className='justify-content-end'>
-                      <NavDropdown.Item className='dropdown-item navbar-dropdown'>
-                        <Button  variant="light" type="submit" onClick={()=>cerrarSesion()}>
-                          <FontAwesomeIcon icon={faSignOutAlt}/>
-                          &nbsp; &nbsp;Cerrar Sesion
-                        </Button>
-                        
-                      </NavDropdown.Item>
-                  </NavDropdown>
-                </Nav>
-              </Navbar.Collapse>
-          </Navbar>
-        </div>
-    
-    );
+  return (
+    <div className='navbar-tam'>
+      <Navbar className='navbar' variant='dark' expand="lg" fluid>
+        <Navbar.Brand className='navbar-brand' href="/">
+          <img className='imagen-logo' src={recurso1} alt='Logo' />
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse className='justify-content-end navbar-collapse' id="basic-navbar-nav">
+          <Nav>
+            <img src={user} className="avatar perfil" alt="Avatar" />
+            <NavDropdown 
+              title={username}
+              id="basic-nav-dropdown" 
+              className='justify-content-end'
+            >
+              <NavDropdown.Item className='dropdown-item navbar-dropdown'>
+                <Button 
+                  variant="light" 
+                  type="button"
+                  onClick={cerrarSesion}
+                >
+                  <FontAwesomeIcon icon={faSignOutAlt}/>
+                  &nbsp;&nbsp;Cerrar Sesión
+                </Button>
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+    </div>
+  );
 }
