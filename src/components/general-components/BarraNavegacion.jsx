@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/general-components/navbarMenuPrincipal.css';
 import Cookies from 'universal-cookie';
-import user from '../../assets/react.svg';
+import user from '../../assets/user-icon.png';
 import recurso1 from '../../assets/Logo-sante-sinfondo.svg';
 
 export default function BarraNavegacion() {
