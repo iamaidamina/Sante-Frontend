@@ -2,6 +2,7 @@ import React, { useState } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import illustrationLeft from './assets/illustrationLeft.svg'
+import socket from './socket';
 
 const getUsernameFromToken = (token) => {
   try {
@@ -40,47 +41,57 @@ const LoginPage = () => {
     
   };
   */
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    const data = { email, password };
-
-    try {
-      const response = await fetch('https://sante-backend-production.up.railway.app/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-      });
-
-      const result = await response.json().catch(() => ({}));
-
-      if (response.ok) {
-        const token = result?.token;
-        const tokenUsername = getUsernameFromToken(token);
-        const username =
-          result?.user?.username ||
-          result?.user?.nombres ||
-          tokenUsername ||
-          email.split('@')[0];
-        const userId = result?.user?.id_usuario;
-
-        localStorage.setItem('token', token || '');
-        localStorage.setItem('email', email);
-        localStorage.setItem('username', username);
-        if (userId) {
-          localStorage.setItem('user_id', String(userId));
-        }
-
-        navigate('/medicamentos');
-      } else {
-        setLoginError(result.message || 'Error en login');
+const handleLogin = async (e) => {
+  e.preventDefault();
+  const data = { email, password };
+  try {
+    const response = await fetch('https://sante-backend-production.up.railway.app/api/users/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.ok) {
+      const token = result?.token;
+      if (!token) {
+        setLoginError('Respuesta de login invalida: no se recibio token');
+        return;
       }
-    } catch (error) {
-      setLoginError('Error de conexión');
+      const tokenUsername = getUsernameFromToken(token);
+      const username =
+        result?.user?.username ||
+        result?.user?.nombres ||
+        tokenUsername ||
+        email.split('@')[0];
+      const userId = result?.user?.id_usuario;
+      localStorage.setItem('token', token);
+      localStorage.setItem('email', email);
+      localStorage.setItem('username', username);
+      if (userId) {
+        localStorage.setItem('user_id', String(userId));
+      }
+      // 🔵 Forzar reconexión del socket
+      socket.disconnect();
+      socket.connect();
+      socket.off("connect");
+      socket.once("connect", () => {
+        console.log("Socket conectado:", socket.id);
+        if (userId) {
+          socket.emit("join_user_room", userId);
+          console.log("Uniendo usuario a room:", userId);
+        }
+      });
+      navigate('/medicamentos');
+    } else {
+      setLoginError(result.message || 'Error en login');
     }
-  };
+  } catch (error) {
+    setLoginError('Error de conexión');
+
+  }
+};
 
   return (
     <div style={styles.pageWrapper} className="pageWrapper">

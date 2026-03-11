@@ -68,7 +68,7 @@ useEffect(() => {
 
   };
 
-}, [localStorage.getItem("user_id")]);
+}, []);
 
   return (
     <BrowserRouter>
