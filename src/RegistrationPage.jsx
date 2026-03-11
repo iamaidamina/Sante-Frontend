@@ -71,19 +71,23 @@ const RegistrationPage = () => {
     </div>
     <div style={styles.inputGroupHalf}>
       <label style={styles.label}>Apellidos</label>
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ejemplo@correo.com" style={styles.input} required />
+      <input type="text" placeholder="Apellido de usuario" style={styles.input} required />
     </div>
   </div>
 
   {/* NUEVA FILA: Fecha de Nacimiento (Ocupa el centro) */}
   <div style={styles.row}>
-    <div style={styles.inputGroupFull}>
+    <div style={styles.inputGroupHalf}>
       <label style={styles.label}>Fecha de Nacimiento</label>
       <input 
         type="date" 
         style={styles.input} 
         required 
       />
+    </div>
+    <div style={styles.inputGroupHalf}>
+      <label style={styles.label}>Email</label>
+      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ejemplo@correo.com" style={styles.input} required />
     </div>
   </div>
 
