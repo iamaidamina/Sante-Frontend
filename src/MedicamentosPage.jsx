@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // 1. Added useState
+import React, { useState, useEffect } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
@@ -8,34 +8,125 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 
-const MedicamentosPage = ({ studentsData }) => {
+//const MedicamentosPage = ({ studentsData }) =>
+const MedicamentosPage = () => {
   // 4. Create internal state
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
+  const [medications, setMedications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newMedication, setNewMedication] = useState({
+    nombre: '',
+    descripcion: '',
+    id_frecuencia: '',
+    almacenamiento: ''
+  });
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    //document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
+  useEffect(() => {
+    fetchMedications();
   }, []);
 
-  // 5. Create internal handleLogin
-  const handleLogin = (e) => {
-    e.preventDefault(); // This stops the "?" refresh
+  const fetchMedications = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+       if (!token) {
+      setError('No token found. Please login again.');
+      setIsLoading(false);
+      return;
+    }
 
-    if (email === 'teacher@school.com' && password === 'demo123') {
-      setLoginError('');
-      navigate('/reportes'); // 6. Use navigate instead of setIsLoggedIn
-    } else {
-      setLoginError('Invalid credentials. Try teacher@school.com / demo123');
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/medications', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cargar medicamentos');
+      }
+
+      const data = await response.json();
+      setMedications(data);
+    } catch (error) {
+      setError('No se pudieron cargar los medicamentos');
+      console.error('Fetch error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/medications', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMedication),
+      });
+
+      if (response.ok) {
+        setNewMedication({ nombre: '', descripcion: '', id_frecuencia: '', almacenamiento: '' });
+        setIsModalOpen(false);
+        fetchMedications(); // Refresh list
+      } else {
+        alert('Error al crear medicamento');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('¿Eliminar este medicamento?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      await fetch(`https://sante-backend-production.up.railway.app/api/medications/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      fetchMedications(); // Refresh list
+    } catch (error) {
+      alert('Error al eliminar');
+    }
+  };
+   // ✅ Now safe to return early
+  if (isLoading) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+          Cargando medicamentos...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+
+
 
   return (
     <div style={styles.pageWrapper} className="pageWrapper">
@@ -85,54 +176,42 @@ const MedicamentosPage = ({ studentsData }) => {
                       <th style={styles.tableHeader}>Acciones</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {studentsData.map((student, index) => (
-                      <tr
-                        key={student.id}
-                        style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
-                      >
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <div style={styles.avatar}>{student.medicamento.charAt(0)}</div>
-                            <span>{student.medicamento}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <span style={student.gender === 'Inactivo' ? styles.badgeMale : styles.badgeFemale}>
-                            {student.gender}
-                          </span>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.frecuencia}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.almacenamiento}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.actionGroup}>
-                            <span
-                              title="Editar"
-                              style={styles.editEmoji}
-                              onClick={() => console.log('Edit', student.id)}
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-
-                            </span>
-                            <span
-                              title="Eliminar"
-                              style={styles.deleteEmoji}
-                              onClick={() => console.log('Delete', student.id)}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </span>
-                          </div>
+                       <tbody>
+                    {medications.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                          No hay medicamentos registrados
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      medications.map((medication, index) => (
+                        <tr key={medication.id_medicamento} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <div style={styles.avatar}>{medication.nombre.charAt(0)}</div>
+                              <span>{medication.nombre}</span>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <span style={medication.estado === 'Inactivo' ? styles.badgeMale : styles.badgeFemale}>
+                              {medication.estado || 'Activo'}
+                            </span>
+                          </td>
+                          <td style={styles.tableCell}>{medication.id_frecuencia || 'N/A'}</td>
+                          <td style={styles.tableCell}>{medication.almacenamiento || 'N/A'}</td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.actionGroup}>
+                              <span style={styles.editEmoji} title="Editar" onClick={() => console.log('Edit', medication.id_medicamento)}>
+                                <FontAwesomeIcon icon={faEdit} />
+                              </span>
+                              <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(medication.id_medicamento)}>
+                                <FontAwesomeIcon icon={faTrash} />
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -151,17 +230,25 @@ const MedicamentosPage = ({ studentsData }) => {
               <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
             </div>
 
-            <form style={styles.modalForm} onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+            <form style={styles.modalForm} onSubmit={handleSubmit}>
 
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre</label>
-                  <input style={styles.modalInput} type="text" placeholder="Ej: Paracetamol" />
+                  <input style={styles.modalInput} 
+                  type="text" 
+                  placeholder="Ej: Paracetamol" 
+                  value={newMedication.nombre}
+                  onChange={(e) => setNewMedication({...newMedication, nombre: e.target.value})}/>
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Descripción</label>
-                  <input style={styles.modalInput} type="text" placeholder="Ej: 500mg" />
+                  <input style={styles.modalInput} 
+                  type="text" 
+                  placeholder="Ej: 500mg"
+                  value={newMedication.nombre}
+                  onChange={(e) => setNewMedication({...newMedication, nombre: e.target.value})} />
                 </div>
               </div>
 
@@ -241,15 +328,24 @@ const MedicamentosPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Configuración frecuencia</label>
-                  <input style={styles.modalInput} type="datetime-local" />
+                  <input style={styles.modalInput} 
+                  type="number"
+                   value={newMedication.id_frecuencia}
+                    onChange={(e) => setNewMedication({...newMedication, id_frecuencia: e.target.value})}
+                   />
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Almacenamiento</label>
-                  <input style={styles.modalInput} type="text" placeholder="Ej: L-4562" />
+                  <input style={styles.modalInput} 
+                  type="text" 
+                  placeholder="Ej: L-4562"
+                  value={newMedication.almacenamiento}
+                  onChange={(e) => setNewMedication({...newMedication, almacenamiento: e.target.value})} />
                 </div>
               </div>
 
-              <button type="submit" style={styles.submitButton}>Registrar Medicamento</button>
+              <button type="submit" style={styles.submitButton}
+              >Registrar Medicamento</button>
             </form>
           </div>
         </div>
