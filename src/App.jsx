@@ -41,22 +41,35 @@ export function App() {
 
 useEffect(() => {
 
-  const userId = localStorage.getItem("user_id");
+  socket.on("connect", () => {
 
-  if (userId) {
+    console.log("Conectado al socket:", socket.id);
 
-    console.log("Uniendo a room:", userId);
+    const userId = localStorage.getItem("user_id");
 
-    socket.emit("join_user_room", userId);
+    if (userId) {
 
-    socket.on("alerta_uv", (data) => {
-      alert(data.mensaje + " UV: " + data.valor);
-    });
+      console.log("Uniendo a room:", userId);
 
-  }
+      socket.emit("join_user_room", userId);
+
+    }
+
+  });
+
+  socket.on("uv_alert", (data) => {
+
+    console.log("Alerta UV recibida:", data);
+
+    alert("Radiación UV alta: " + data.valor_uv);
+
+  });
 
   return () => {
-    socket.off("alerta_uv");
+
+    socket.off("connect");
+    socket.off("uv_alert");
+
   };
 
 }, []);
