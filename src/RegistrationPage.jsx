@@ -22,7 +22,7 @@ const RegistrationPage = () => {
       document.body.style.overflow = 'auto';
     };
   }, []);
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -53,6 +53,8 @@ const RegistrationPage = () => {
       }
     } catch (error) {
       setRegisterError('Error de conexión');
+    } finally {
+      setIsLoading(false); // ← Siempre limpia
     }
   };
 
@@ -181,8 +183,8 @@ const RegistrationPage = () => {
                 )}
 
                 <div style={styles.buttonWrapper}>
-                  <button type="submit" style={styles.loginButton}>
-                    Registrarse {/*<span style={styles.buttonArrow}>→</span>*/}
+                  <button disabled={isLoading} type="submit">
+                    {isLoading ? 'Registrando...' : 'Registrarse'}
                   </button>
                 </div>
               </form>
