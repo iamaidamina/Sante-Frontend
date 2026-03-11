@@ -7,6 +7,7 @@ import '../../styles/general-components/navbarMenuPrincipal.css';
 import Cookies from 'universal-cookie';
 import user from '../../assets/user-icon.png';
 import recurso1 from '../../assets/Logo-sante-sinfondo.svg';
+import socket from '../../socket';
 
 const getUsernameFromToken = (token) => {
   try {
@@ -36,12 +37,14 @@ export default function BarraNavegacion() {
   }, [navigate, token]); // ✅ Added token dependency
 
   const cerrarSesion = () => {
+    socket.disconnect();
     // ✅ Clean BOTH storage methods for consistency
     cookies.remove('token', { path: '/' });
     cookies.remove('username', { path: '/' });
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     localStorage.removeItem('email'); // If you store email here too
+    localStorage.removeItem('user_id');
     navigate('/', { replace: true });
   };
 

@@ -7,11 +7,9 @@ import EntregasPage from './EntregasPage';
 import CitasPage from './CitasPage';
 import ReportesPage from './ReportesPage';
 import ExamenesPage from './ExamenesPage';
-
-import { io } from 'socket.io-client';
+import socket from './socket';
 import {useEffect} from 'react';
 
-const socket = io('https://sante-backend-production.up.railway.app'); // Connect to the Socket.IO server
 // Sample student data 
 const studentsData = [
   { id: 1,concepto:"Furosemida 40 mg",medicamento: "Losartán 50 mg",domiciliario:"Valentina Rojas",compra:"Drogueria San Jorge",fecha: 'Martes, 14 de Marzo del 2026',profesional: 'Andrés Vargas',especialidad: 'Cardiología',lugar: 'Clinica Imbanaco',name: 'Ana Rodríguez', gender: 'Activo',estado: 'Pendiente', frecuencia: '2:00',almacenamiento: 'Cajón Habitación',problemSolving: 85, criticalThinking: 92, creativity: 78, overall: 85 },
@@ -41,25 +39,23 @@ export function App() {
 
 useEffect(() => {
 
+  const userId = localStorage.getItem("user_id");
+
+  if (!userId) return;
+
+  socket.connect();
+
   socket.on("connect", () => {
 
-    console.log("Conectado al socket:", socket.id);
+    console.log("Socket conectado:", socket.id);
 
-    const userId = localStorage.getItem("user_id");
+    socket.emit("join_user_room", userId);
 
-    if (userId) {
-
-      console.log("Uniendo a room:", userId);
-
-      socket.emit("join_user_room", userId);
-
-    }
+    console.log("Uniendo usuario:", userId);
 
   });
 
   socket.on("uv_alert", (data) => {
-
-    console.log("Alerta UV recibida:", data);
 
     alert("Radiación UV alta: " + data.valor_uv);
 
@@ -72,7 +68,7 @@ useEffect(() => {
 
   };
 
-}, []);
+}, [localStorage.getItem("user_id")]);
 
   return (
     <BrowserRouter>
