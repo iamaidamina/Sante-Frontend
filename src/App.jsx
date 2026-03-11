@@ -39,17 +39,27 @@ export function App() {
     bodyStyle.overflowX = 'hidden';
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
+
+  const userId = localStorage.getItem("user_id");
+
+  if (userId) {
+
+    console.log("Uniendo a room:", userId);
+
+    socket.emit("join_user_room", userId);
 
     socket.on("alerta_uv", (data) => {
       alert(data.mensaje + " UV: " + data.valor);
     });
 
-    return () => {
-      socket.off("alerta_uv");
-    };
+  }
 
-  }, []);
+  return () => {
+    socket.off("alerta_uv");
+  };
+
+}, []);
 
   return (
     <BrowserRouter>

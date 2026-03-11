@@ -2,6 +2,18 @@ import React, { useState } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import illustrationLeft from './assets/illustrationLeft.svg'
+
+const getUsernameFromToken = (token) => {
+  try {
+    const payload = token?.split('.')[1];
+    if (!payload) return null;
+    const decoded = JSON.parse(atob(payload));
+    return decoded?.username || decoded?.name || decoded?.nombres || decoded?.email?.split('@')[0] || null;
+  } catch {
+    return null;
+  }
+};
+
 const LoginPage = () => {
   // 4. Create internal state
   const [email, setEmail] = useState('');
@@ -42,12 +54,25 @@ const LoginPage = () => {
         body: JSON.stringify(data)
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       if (response.ok) {
-        // Guarda el token en localStorage
-        localStorage.setItem('token', result.token);
+        const token = result?.token;
+        const tokenUsername = getUsernameFromToken(token);
+        const username =
+          result?.user?.username ||
+          result?.user?.nombres ||
+          tokenUsername ||
+          email.split('@')[0];
+        const userId = result?.user?.id_usuario;
+
+        localStorage.setItem('token', token || '');
         localStorage.setItem('email', email);
+        localStorage.setItem('username', username);
+        if (userId) {
+          localStorage.setItem('user_id', String(userId));
+        }
+
         navigate('/medicamentos');
       } else {
         setLoginError(result.message || 'Error en login');

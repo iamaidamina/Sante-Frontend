@@ -8,11 +8,26 @@ import Cookies from 'universal-cookie';
 import user from '../../assets/user-icon.png';
 import recurso1 from '../../assets/Logo-sante-sinfondo.svg';
 
+const getUsernameFromToken = (token) => {
+  try {
+    const payload = token?.split('.')[1];
+    if (!payload) return null;
+    const decoded = JSON.parse(atob(payload));
+    return decoded?.username || decoded?.name || decoded?.nombres || decoded?.email?.split('@')[0] || null;
+  } catch {
+    return null;
+  }
+};
+
 export default function BarraNavegacion() {
   const cookies = new Cookies();
   const navigate = useNavigate(); // ✅ FIXED: Now works with import
   const token = localStorage.getItem('token'); // ✅ Use localStorage like login
-  const username = cookies.get('username') || localStorage.getItem('email') || 'Usuario';
+  const username =
+    cookies.get('username') ||
+    localStorage.getItem('username') ||
+    getUsernameFromToken(token) ||
+    'Usuario';
 
   useEffect(() => {
     if (!token) {
@@ -25,6 +40,7 @@ export default function BarraNavegacion() {
     cookies.remove('token', { path: '/' });
     cookies.remove('username', { path: '/' });
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
     localStorage.removeItem('email'); // If you store email here too
     navigate('/', { replace: true });
   };
