@@ -19,6 +19,7 @@ const LoginPage = () => {
   }, []);
 
   // 5. Create internal handleLogin
+  /*
   const handleLogin = (e) => {
     e.preventDefault(); // This stops the "?" refresh
 
@@ -26,11 +27,39 @@ const LoginPage = () => {
       navigate('/medicamentos'); // 6. Use navigate instead of setIsLoggedIn
     
   };
+  */
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    const data = { email, password };
+
+    try {
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Guarda el token en localStorage
+        localStorage.setItem('token', result.token);
+        navigate('/medicamentos');
+      } else {
+        setLoginError(result.message || 'Error en login');
+      }
+    } catch (error) {
+      setLoginError('Error de conexión');
+    }
+  };
 
   return (
     <div style={styles.pageWrapper} className="pageWrapper">
       <div style={styles.loginContainer} className="loginContainer">
-         {/* Right Side - Login Form */}
+        {/* Right Side - Login Form */}
         <div style={styles.rightSide} className="rightSide">
           <div style={styles.loginCard}>
             <div style={styles.loginHeader}>
@@ -40,12 +69,12 @@ const LoginPage = () => {
             <div style={styles.gradientFrame}>
               <form onSubmit={handleLogin} style={styles.loginForm}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>Usuario</label>
+                  <label style={styles.label}>Email</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Digitar el usuario"
+                    placeholder="Digitar el email"
                     style={styles.input}
                     required
                   />
@@ -79,9 +108,9 @@ const LoginPage = () => {
 
                 {/* NEW: Forgot Password Link */}
                 <div style={styles.forgotPasswordContainer}>
-                  <p href="#forgot" style={styles.forgotPasswordLink}>
+                  <a href="#forgot" style={styles.forgotPasswordLink}>
                     ¿Olvidó la contraseña?
-                  </p>
+                  </a>
                 </div>
                 {/* NEW: Forgot Password Link */}
                 <div style={styles.forgotPasswordContainer}>
@@ -102,8 +131,8 @@ const LoginPage = () => {
           <div style={styles.decorativeCircle3}></div>
 
           <div style={styles.leftContent}>
-        
-            
+
+
             <div style={styles.iconBigContainer}>
               <div style={{
                 ...styles.floatingBigIcon, animationDelay: '0s',
@@ -112,14 +141,14 @@ const LoginPage = () => {
               }}>
                 <img src={illustrationLeft} alt="Teacher" style={styles.iconBigStyle} />
               </div>
-        
+
             </div>
 
 
           </div>
         </div>
 
-       
+
       </div>
 
 
@@ -224,7 +253,7 @@ const styles = {
     flexDirection: 'column',
     minHeight: '100vh', // Ensures it covers the screen
     width: '100vw',
-    overflowY: 'auto', 
+    overflowY: 'auto',
   },
   // Ensure the middle content grows to push the footer down
   loginContainer: {
