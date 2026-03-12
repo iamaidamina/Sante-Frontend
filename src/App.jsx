@@ -7,13 +7,10 @@ import EntregasPage from './EntregasPage';
 import CitasPage from './CitasPage';
 import ReportesPage from './ReportesPage';
 import ExamenesPage from './ExamenesPage';
-import socket from './socket';
-import {useEffect} from 'react';
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NotificationManager from "./components/NotificationManager";
 
-
-import bloqueador from "./assets/bloqueador-loreal.jpg";
 // Sample student data 
 const studentsData = [
   { id: 1,concepto:"Furosemida 40 mg",medicamento: "Losartán 50 mg",domiciliario:"Valentina Rojas",compra:"Drogueria San Jorge",fecha: 'Martes, 14 de Marzo del 2026',profesional: 'Andrés Vargas',especialidad: 'Cardiología',lugar: 'Clinica Imbanaco',name: 'Ana Rodríguez', gender: 'Activo',estado: 'Pendiente', frecuencia: '2:00',almacenamiento: 'Cajón Habitación',problemSolving: 85, criticalThinking: 92, creativity: 78, overall: 85 },
@@ -40,76 +37,6 @@ export function App() {
     bodyStyle.height = bodyStyle.width = '100%';
     bodyStyle.overflowX = 'hidden';
   }, []);
-
-useEffect(() => {
-
-  const userId = localStorage.getItem("user_id");
-
-  if (!userId) return;
-
-  socket.connect();
-
-  socket.on("connect", () => {
-
-    console.log("Socket conectado:", socket.id);
-
-    socket.emit("join_user_room", userId);
-
-    console.log("Uniendo usuario:", userId);
-
-  });
-
-socket.on("uv_alert", (data) => {
-
-  toast.warning(
-    <div style={{ textAlign: "center" }}>
-
-      <strong>⚠ Radiación UV {data.nivel_riesgo.toUpperCase()}</strong>
-
-      <p>UV: {data.valor_uv}</p>
-
-      <p>Usa bloqueador solar</p>
-
-      <img
-        src={bloqueador}
-        alt="Bloqueador Loreal"
-        style={{ width: "80px", margin: "10px auto" }}
-      />
-
-      <br/>
-
-      <a
-        href="https://www.lorealparis.com.co/uv-defender/fluido-invisible-anti-fotoenvejecimiento-fps-50"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          background: "#ff9800",
-          color: "white",
-          padding: "8px 12px",
-          borderRadius: "6px",
-          textDecoration: "none",
-          fontSize: "14px"
-        }}
-      >
-        Comprar
-      </a>
-
-    </div>,
-    {
-      position: "top-right",
-      autoClose: 8000
-    }
-  );
-
-});
-  return () => {
-
-    socket.off("connect");
-    socket.off("uv_alert");
-
-  };
-
-}, []);
 
   return (
     <>
@@ -153,6 +80,7 @@ socket.on("uv_alert", (data) => {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
+     <NotificationManager />
     <ToastContainer />
     </>
   );
