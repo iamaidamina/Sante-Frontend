@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // 1. Added useState
+import React, { useState, useEffect } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
@@ -8,35 +8,211 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import Select from 'react-select';
-const CitasPage = ({ studentsData }) => {
+const CitasPage = () => {
   // 4. Create internal state
+  /*
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selected, setSelected] = useState({ value: 'individual', label: 'Individual' });
   const navigate = useNavigate();
+  */
+  const [appointments, setAppointments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newAppointment, setNewAppointment] = useState({
+    nombre_medico: '',
+    id_especialidad: '',
+    descripcion: '',
+    tipo: '',
+    lugar: '',
+    fecha_hora: ''
+  });
 
-  React.useEffect(() => {
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    //document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchAppointments();
   }, []);
 
-  // 5. Create internal handleLogin
-  const handleLogin = (e) => {
-    e.preventDefault(); // This stops the "?" refresh
+  const fetchAppointments = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No token found. Please login again.');
+        setIsLoading(false);
+        return;
+      }
 
-    if (email === 'teacher@school.com' && password === 'demo123') {
-      setLoginError('');
-      navigate('/reportes'); // 6. Use navigate instead of setIsLoggedIn
-    } else {
-      setLoginError('Invalid credentials. Try teacher@school.com / demo123');
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/appointments', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cargar citas');
+      }
+
+      const data = await response.json();
+      setAppointments(data);
+    } catch (error) {
+      setError('No se pudieron cargar las citas');
+      console.error('Fetch error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
+  /**/
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('🛠️ Creating:', newAppointment);
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newAppointment),
+      });
+
+      if (response.ok) {
+        setNewAppointment({
+          nombre_medico: '',
+          id_especialidad: null,
+          descripcion: '',
+          tipo: '',
+          lugar: '',
+          fecha_hora: ''
+        });
+        setIsModalOpen(false);
+        fetchAppointments(); // Refresh list
+      } else {
+        alert('Error al crear cita');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+  const handleDelete = async (id) => {
+    if (!confirm('¿Eliminar esta cita?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+
+      await fetch(`https://sante-backend-production.up.railway.app/api/appointments/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      fetchAppointments(); // Refresh list
+    } catch (error) {
+      alert('Error al eliminar');
+    }
+  };
+
+  const handleEdit = (id, appointment) => {
+    /*
+    setEditingMedication({ ...medication, id_medicamento: id });
+    setIsEditMode(true);
+    setIsModalOpen(true);  // ← THIS OPENS MODAL
+    */
+    const cleanAppoinment = {
+      id_cita: id,
+      nombre_medico: appointment.nombre_medico || '',
+      id_especialidad: appointment.id_especialidad ? parseInt(appointment.id_especialidad, 10) : 1,
+      descripcion: appointment.descripcion || '',
+      tipo: appointment.tipo || '',
+      lugar: appointment.lugar || '',
+      fecha_hora: appointment.fecha_hora
+        ? new Date(appointment.fecha_hora).toISOString().slice(0, 16)
+        : '2026-03-14T14:32:44.964Z'
+    };
+
+    setEditingAppointment(cleanAppoinment);
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!editingAppointment) {
+      alert('No appointment selected for editing');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(
+        `https://sante-backend-production.up.railway.app/api/appointments/${editingAppointment.id_cita}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(editingAppointment),
+        }
+      );
+
+      if (response.ok) {
+        setIsEditMode(false);
+        setEditingAppointment(null);
+        setIsModalOpen(false);
+        fetchAppointments(); // Refresh list
+      } else {
+        alert('Error al actualizar');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+
+  const getSpecialtyName = (id) => {
+  const specialties = {
+    1: 'Medicina General',
+    2: 'Odontología', 
+    3: 'Cardiología',
+    4: 'Geriatría'
+  };
+  return specialties[id] || id || 'N/A';
+};
+
+  // ✅ Now safe to return early
+  if (isLoading) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+          Cargando citas...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.pageWrapper} className="pageWrapper">
@@ -72,9 +248,8 @@ const CitasPage = ({ studentsData }) => {
                 <table style={styles.table}>
                   <thead style={styles.stickyHeader}>
                     <tr style={styles.tableHeaderRow}>
-                      <th style={styles.tableHeader}>Lugar</th>
-                      <th style={styles.tableHeader}>Estado</th>
                       <th style={styles.tableHeader}>Especialidad</th>
+                      <th style={styles.tableHeader}>Lugar</th>
                       <th style={styles.tableHeader}>Profesional</th>
                       <th style={styles.tableHeader}>Fecha</th>
                       <th style={styles.tableHeader}>Acciones</th>
@@ -82,56 +257,61 @@ const CitasPage = ({ studentsData }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {studentsData.map((student, index) => (
-                      <tr
-                        key={student.id}
-                        style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
-                      >
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.lugar}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <span style={student.gender === 'Inactivo' ? styles.badgeMale : styles.badgeFemale}>
-                            {student.gender}
-                          </span>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.especialidad}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.profesional}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.fecha}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.actionGroup}>
-                            <span
-                              title="Editar"
-                              style={styles.editEmoji}
-                              onClick={() => console.log('Edit', student.id)}
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </span>
-                            <span
-                              title="Eliminar"
-                              style={styles.deleteEmoji}
-                              onClick={() => console.log('Delete', student.id)}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </span>
-                          </div>
+                    {appointments.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                          No hay medicamentos registrados
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      appointments.map((appointment, index) => (
+                        <tr key={appointment.id_cita} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <div style={styles.avatar}>{getSpecialtyName(appointment.id_especialidad).charAt(0)}</div>
+                              <span>{getSpecialtyName(appointment.id_especialidad)}</span>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <span>{appointment.lugar || 'N/A'}</span>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <span>{appointment.nombre_medico || 'N/A'}</span>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <span>
+                                {appointment.fecha_hora
+                                  ? new Date(appointment.fecha_hora).toLocaleString('es-CO', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    timeZone: 'America/Bogota'  // Your timezone
+                                  })
+                                  : 'N/A'
+                                }
+                              </span>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.actionGroup}>
+                              <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(appointment.id_cita, appointment)}>
+                                <FontAwesomeIcon icon={faEdit} />
+                              </span>
+                              <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(appointment.id_cita)}>
+                                <FontAwesomeIcon icon={faTrash} />
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -146,22 +326,59 @@ const CitasPage = ({ studentsData }) => {
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
-              <h3>Nueva Cita</h3>
-              <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
+              <h3>{isEditMode ? 'Editar Cita' : 'Nueva Cita'}</h3>
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setIsEditMode(false);
+                  setEditingAppointment(null);
+                }}
+                style={styles.closeButton}>✕
+              </button>
             </div>
 
-            <form style={styles.modalForm} onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+            <form style={styles.modalForm} onSubmit={isEditMode ? handleUpdate : handleSubmit}>
 
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre medico</label>
-                  <input style={styles.modalInput} type="text" placeholder="medico" />
+                  <input style={styles.modalInput}
+                    type="text"
+                    placeholder="medico"
+                    value={isEditMode ? editingAppointment.nombre_medico : newAppointment.nombre_medico}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingAppointment({ ...editingAppointment, nombre_medico: e.target.value });
+                      } else {
+                        setNewAppointment({ ...newAppointment, nombre_medico: e.target.value });
+                      }
+                    }} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Nombre especialidad</label>
-                  <input style={styles.modalInput} type="text" placeholder="especialidad" />
+                  <label style={styles.fieldLabel}>Especialidad</label>
+                  <select
+                    style={styles.modalInput}
+                    value={isEditMode ? editingAppointment?.id_especialidad || '' : newAppointment.id_especialidad || ''}
+                    onChange={(e) => {
+                      // ✅ PARSE TO NUMBER
+                      const numberValue = parseInt(e.target.value) || null;
+
+                      if (isEditMode) {
+                        setEditingAppointment({ ...editingAppointment, id_especialidad: numberValue });
+                      } else {
+                        setNewAppointment({ ...newAppointment, id_especialidad: numberValue });
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar especialidad</option>
+                    <option value="1">Medicina General</option>
+                    <option value="2">Odontología</option>
+                    <option value="3">Cardiología</option>
+                    <option value="4">Geriatría</option>
+                  </select>
                 </div>
+
               </div>
 
               {/* Fila 2: Selectores de Imagen / Drag & Drop */}
@@ -169,20 +386,36 @@ const CitasPage = ({ studentsData }) => {
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Descripción</label>
-                  <input style={styles.modalInput} type="text" placeholder="descripción" />
+                  <input style={styles.modalInput} type="text"
+                    placeholder="descripción"
+                    value={isEditMode ? editingAppointment.descripcion : newAppointment.descripcion}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingAppointment({ ...editingAppointment, descripcion: e.target.value });
+                      } else {
+                        setNewAppointment({ ...newAppointment, descripcion: e.target.value });
+                      }
+                    }} />
                 </div>
 
                 {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Tipo</label>
-                  <Select
-                    options={[
-                      { value: 'periodica', label: 'Periodica' },
-                      { value: 'individual', label: 'Individual' }
-                    ]}
-                    value={selected}
-  onChange={(option) => setSelected(option)}  // Store full object
-                  />
+                  <select
+                    style={styles.modalInput}
+                    value={isEditMode ? editingAppointment?.tipo || '' : newAppointment.tipo || ''}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingAppointment({ ...editingAppointment, tipo: e.target.value });
+                      } else {
+                        setNewAppointment({ ...newAppointment, tipo: e.target.value });
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar tipo</option>
+                    <option value="periodica">Periódica</option>
+                    <option value="individual">Individual</option>
+                  </select>
                 </div>
               </div>
 
@@ -190,15 +423,35 @@ const CitasPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Fecha y hora</label>
-                  <input style={styles.modalInput} type="datetime-local" />
+                  <input style={styles.modalInput}
+                    type="datetime-local"
+                    value={isEditMode ? editingAppointment.fecha_hora : newAppointment.fecha_hora}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingAppointment({ ...editingAppointment, fecha_hora: e.target.value });
+                      } else {
+                        setNewAppointment({ ...newAppointment, fecha_hora: e.target.value });
+                      }
+                    }}
+                  />
+
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Lugar</label>
-                  <input style={styles.modalInput} type="text" placeholder="lugar" />
+                  <input style={styles.modalInput} type="text"
+                    placeholder="lugar"
+                    value={isEditMode ? editingAppointment.lugar : newAppointment.lugar}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingAppointment({ ...editingAppointment, lugar: e.target.value });
+                      } else {
+                        setNewAppointment({ ...newAppointment, lugar: e.target.value });
+                      }
+                    }} />
                 </div>
               </div>
 
-              <button type="submit" style={styles.submitButton}>Registrar Cita</button>
+              <button type="submit" style={styles.submitButton}>{isEditMode ? 'Actualizar Cita' : 'Registrar Cita'}</button>
             </form>
           </div>
         </div>
