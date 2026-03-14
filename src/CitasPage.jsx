@@ -260,7 +260,7 @@ const CitasPage = () => {
                     {appointments.length === 0 ? (
                       <tr>
                         <td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-                          No hay medicamentos registrados
+                          No hay citas medicas registradas
                         </td>
                       </tr>
                     ) : (

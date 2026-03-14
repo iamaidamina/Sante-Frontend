@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // 1. Added useState
+import React, { useState, useEffect } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
@@ -9,6 +9,7 @@ import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import Select from 'react-select';
 const ExamenesPage = ({ studentsData }) => {
+  /*
   // 4. Create internal state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,28 +17,188 @@ const ExamenesPage = ({ studentsData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selected, setSelected] = useState({ value: 'individual', label: 'Individual' });
   const navigate = useNavigate();
+  */
+  const [tests, setTests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newTest, setNewTest] = useState({
+    nombre_medico: '',
+    nombre_examen: '',
+    descripcion: '',
+    lugar: '',
+    fecha_hora: ''
+  });
 
-  React.useEffect(() => {
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    //document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingTest, setEditingTest] = useState(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+    fetchTests();
   }, []);
 
-  // 5. Create internal handleLogin
-  const handleLogin = (e) => {
-    e.preventDefault(); // This stops the "?" refresh
+  const fetchTests = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No token found. Please login again.');
+        setIsLoading(false);
+        return;
+      }
 
-    if (email === 'teacher@school.com' && password === 'demo123') {
-      setLoginError('');
-      navigate('/reportes'); // 6. Use navigate instead of setIsLoggedIn
-    } else {
-      setLoginError('Invalid credentials. Try teacher@school.com / demo123');
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/tests', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cargar examenes');
+      }
+
+      const data = await response.json();
+      setTests(data);
+    } catch (error) {
+      setError('No se pudieron cargar los examenes');
+      console.error('Fetch error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('🛠️ Creating:', newTest);
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/tests', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTest),
+      });
+
+      if (response.ok) {
+        setNewTest({
+          nombre_medico: '',
+          nombre_examen: '',
+          descripcion: '',
+          lugar: '',
+          fecha_hora: ''
+        });
+        setIsModalOpen(false);
+        fetchTests(); // Refresh list
+      } else {
+        alert('Error al crear examen');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('¿Eliminar este examén?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+
+      await fetch(`https://sante-backend-production.up.railway.app/api/tests/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      fetchTests(); // Refresh list
+    } catch (error) {
+      alert('Error al eliminar');
+    }
+  };
+
+  const handleEdit = (id, test) => {
+    /*
+    setEditingMedication({ ...medication, id_medicamento: id });
+    setIsEditMode(true);
+    setIsModalOpen(true);  // ← THIS OPENS MODAL
+    */
+    const cleanAppoinment = {
+      id_test: id,
+      nombre_medico: test.nombre_medico || '',
+      nombre_examen: test.nombre_examen || '',
+      descripcion: test.descripcion || '',
+      lugar: test.lugar || '',
+      fecha_hora: test.fecha_hora
+        ? new Date(test.fecha_hora).toISOString().slice(0, 16)
+        : '2026-03-14T14:32:44.964Z'
+    };
+
+    setEditingTest(cleanAppoinment);
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!editingTest) {
+      alert('No appointment selected for editing');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(
+        `https://sante-backend-production.up.railway.app/api/tests/${editingTest.id_test}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(editingTest),
+        }
+      );
+
+      if (response.ok) {
+        setIsEditMode(false);
+        setEditingTest(null);
+        setIsModalOpen(false);
+        fetchTests(); // Refresh list
+      } else {
+        alert('Error al actualizar');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+
+  // ✅ Now safe to return early
+  if (isLoading) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+          Cargando citas...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>
+          {error}
+        </div>
+      </div>
+    );
+  }
   return (
     <div style={styles.pageWrapper} className="pageWrapper">
 
@@ -72,9 +233,8 @@ const ExamenesPage = ({ studentsData }) => {
                 <table style={styles.table}>
                   <thead style={styles.stickyHeader}>
                     <tr style={styles.tableHeaderRow}>
+                      <th style={styles.tableHeader}>Examén</th>
                       <th style={styles.tableHeader}>Lugar</th>
-                      <th style={styles.tableHeader}>Estado</th>
-                      <th style={styles.tableHeader}>Especialidad</th>
                       <th style={styles.tableHeader}>Profesional</th>
                       <th style={styles.tableHeader}>Fecha</th>
                       <th style={styles.tableHeader}>Acciones</th>
@@ -82,34 +242,49 @@ const ExamenesPage = ({ studentsData }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {studentsData.map((student, index) => (
+                    {tests.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                          No hay examenes registrados
+                        </td>
+                      </tr>
+                    ) : (
+                      tests.map((test, index) => (
                       <tr
-                        key={student.id}
+                        key={test.id_test}
                         style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
                       >
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{student.lugar}</span>
+                            <div style={styles.avatar}>{test.nombre_examen.charAt(0)}</div>
+                              <span>{test.nombre_examen}</span>
                           </div>
                         </td>
-                        <td style={styles.tableCell}>
-                          <span style={student.gender === 'Inactivo' ? styles.badgeMale : styles.badgeFemale}>
-                            {student.gender}
-                          </span>
-                        </td>
+
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{student.especialidad}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.profesional}</span>
+                            <span>{test.lugar}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{student.fecha}</span>
+                            <span>{test.nombre_medico}</span>
+                          </div>
+                        </td>
+                        <td style={styles.tableCell}>
+                          <div style={styles.studentName}>
+                            <span>  {test.fecha_hora
+                                  ? new Date(test.fecha_hora).toLocaleString('es-CO', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    timeZone: 'America/Bogota'  // Your timezone
+                                  })
+                                  : 'N/A'
+                                }
+                              </span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
@@ -131,7 +306,8 @@ const ExamenesPage = ({ studentsData }) => {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -146,21 +322,45 @@ const ExamenesPage = ({ studentsData }) => {
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
-              <h3>Nuevo Examen</h3>
-              <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
+              <h3>{isEditMode ? 'Editar Examén' : 'Nuevo Examén'}</h3>
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setIsEditMode(false);
+                  setEditingTest(null);
+                }}
+                style={styles.closeButton}>✕
+              </button>
             </div>
 
-            <form style={styles.modalForm} onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+            <form style={styles.modalForm} onSubmit={isEditMode ? handleUpdate : handleSubmit}>
 
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre medico</label>
-                  <input style={styles.modalInput} type="text" placeholder="medico" />
+                  <input style={styles.modalInput} type="text" 
+                  placeholder="medico"
+                  value={isEditMode ? editingTest.nombre_medico : newTest.nombre_medico}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingTest({ ...editingTest, nombre_medico: e.target.value });
+                      } else {
+                        setNewTest({ ...newTest, nombre_medico: e.target.value });
+                      }
+                    }} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Nombre especialidad</label>
-                  <input style={styles.modalInput} type="text" placeholder="especialidad" />
+                  <label style={styles.fieldLabel}>Nombre examén</label>
+                  <input style={styles.modalInput} type="text" placeholder="examén"
+                   value={isEditMode ? editingTest.nombre_examen : newTest.nombre_examen}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingTest({ ...editingTest, nombre_examen: e.target.value });
+                      } else {
+                        setNewTest({ ...newTest, nombre_examen: e.target.value });
+                      }
+                    }} />
                 </div>
               </div>
 
@@ -169,13 +369,21 @@ const ExamenesPage = ({ studentsData }) => {
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Descripción</label>
-                  <input style={styles.modalInput} type="text" placeholder="descripción" />
+                  <input style={styles.modalInput} type="text" placeholder="descripción" 
+                  value={isEditMode ? editingTest.descripcion : newTest.descripcion}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingTest({ ...editingTest, descripcion: e.target.value });
+                      } else {
+                        setNewTest({ ...newTest, descripcion: e.target.value });
+                      }
+                    }}/>
                 </div>
 
                 {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Subir orden examen</label>
-                 <div style={styles.fileButtonContainer}>
+                  <div style={styles.fileButtonContainer}>
                     <input
                       type="file"
                       id="fileLateral"
@@ -211,15 +419,33 @@ const ExamenesPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Fecha y hora</label>
-                  <input style={styles.modalInput} type="datetime-local" />
+                  <input style={styles.modalInput} type="datetime-local"
+                  value={isEditMode ? editingAppointment.fecha_hora : newTest.fecha_hora}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingTest({ ...editingAppointment, fecha_hora: e.target.value });
+                      } else {
+                        setNewTest({ ...newTest, fecha_hora: e.target.value });
+                      }
+                    }} />
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Lugar</label>
-                  <input style={styles.modalInput} type="text" placeholder="lugar" />
+                  <input style={styles.modalInput} type="text" 
+                  placeholder="lugar"
+                  value={isEditMode ? editingTest.lugar : newTest.lugar}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingTest({ ...editingTest, lugar: e.target.value });
+                      } else {
+                        setNewTest({ ...newTest, lugar: e.target.value });
+                      }
+                    }}
+                  />
                 </div>
               </div>
 
-              <button type="submit" style={styles.submitButton}>Registrar Examen</button>
+              <button type="submit" style={styles.submitButton}>{isEditMode ? 'Actualizar Examén' : 'Registrar Examén'}</button>
             </form>
           </div>
         </div>
