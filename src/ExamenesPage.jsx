@@ -250,62 +250,54 @@ const ExamenesPage = ({ studentsData }) => {
                       </tr>
                     ) : (
                       tests.map((test, index) => (
-                      <tr
-                        key={test.id_test}
-                        style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
-                      >
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <div style={styles.avatar}>{test.nombre_examen.charAt(0)}</div>
+                        <tr
+                          key={test.id_test}
+                          style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
+                        >
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <div style={styles.avatar}>{test.nombre_examen.charAt(0)}</div>
                               <span>{test.nombre_examen}</span>
-                          </div>
-                        </td>
+                            </div>
+                          </td>
 
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{test.lugar}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{test.nombre_medico}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>  {test.fecha_hora
-                                  ? new Date(test.fecha_hora).toLocaleString('es-CO', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    timeZone: 'America/Bogota'  // Your timezone
-                                  })
-                                  : 'N/A'
-                                }
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <span>{test.lugar}</span>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <span>{test.nombre_medico}</span>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.studentName}>
+                              <span>  {test.fecha_hora
+                                ? new Date(test.fecha_hora).toLocaleString('es-CO', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  timeZone: 'America/Bogota'  // Your timezone
+                                })
+                                : 'N/A'
+                              }
                               </span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.actionGroup}>
-                            <span
-                              title="Editar"
-                              style={styles.editEmoji}
-                              onClick={() => console.log('Edit', student.id)}
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </span>
-                            <span
-                              title="Eliminar"
-                              style={styles.deleteEmoji}
-                              onClick={() => console.log('Delete', student.id)}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
+                            </div>
+                          </td>
+                          <td style={styles.tableCell}>
+                            <div style={styles.actionGroup}>
+                              <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(test.id_test, test)}>
+                                <FontAwesomeIcon icon={faEdit} />
+                              </span>
+                              <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(test.id_test)}>
+                                <FontAwesomeIcon icon={faTrash} />
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
                       ))
                     )}
                   </tbody>
@@ -339,9 +331,9 @@ const ExamenesPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre medico</label>
-                  <input style={styles.modalInput} type="text" 
-                  placeholder="medico"
-                  value={isEditMode ? editingTest.nombre_medico : newTest.nombre_medico}
+                  <input style={styles.modalInput} type="text"
+                    placeholder="medico"
+                    value={isEditMode ? editingTest.nombre_medico : newTest.nombre_medico}
                     onChange={(e) => {
                       if (isEditMode) {
                         setEditingTest({ ...editingTest, nombre_medico: e.target.value });
@@ -353,7 +345,7 @@ const ExamenesPage = ({ studentsData }) => {
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre examén</label>
                   <input style={styles.modalInput} type="text" placeholder="examén"
-                   value={isEditMode ? editingTest.nombre_examen : newTest.nombre_examen}
+                    value={isEditMode ? editingTest.nombre_examen : newTest.nombre_examen}
                     onChange={(e) => {
                       if (isEditMode) {
                         setEditingTest({ ...editingTest, nombre_examen: e.target.value });
@@ -369,15 +361,15 @@ const ExamenesPage = ({ studentsData }) => {
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Descripción</label>
-                  <input style={styles.modalInput} type="text" placeholder="descripción" 
-                  value={isEditMode ? editingTest.descripcion : newTest.descripcion}
+                  <input style={styles.modalInput} type="text" placeholder="descripción"
+                    value={isEditMode ? editingTest.descripcion : newTest.descripcion}
                     onChange={(e) => {
                       if (isEditMode) {
                         setEditingTest({ ...editingTest, descripcion: e.target.value });
                       } else {
                         setNewTest({ ...newTest, descripcion: e.target.value });
                       }
-                    }}/>
+                    }} />
                 </div>
 
                 {/* Input 2: Traditional Button Style */}
@@ -420,10 +412,10 @@ const ExamenesPage = ({ studentsData }) => {
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Fecha y hora</label>
                   <input style={styles.modalInput} type="datetime-local"
-                  value={isEditMode ? editingAppointment.fecha_hora : newTest.fecha_hora}
+                    value={isEditMode ? editingTest.fecha_hora : newTest.fecha_hora}
                     onChange={(e) => {
                       if (isEditMode) {
-                        setEditingTest({ ...editingAppointment, fecha_hora: e.target.value });
+                        setEditingTest({ ...editingTest, fecha_hora: e.target.value });
                       } else {
                         setNewTest({ ...newTest, fecha_hora: e.target.value });
                       }
@@ -431,9 +423,9 @@ const ExamenesPage = ({ studentsData }) => {
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Lugar</label>
-                  <input style={styles.modalInput} type="text" 
-                  placeholder="lugar"
-                  value={isEditMode ? editingTest.lugar : newTest.lugar}
+                  <input style={styles.modalInput} type="text"
+                    placeholder="lugar"
+                    value={isEditMode ? editingTest.lugar : newTest.lugar}
                     onChange={(e) => {
                       if (isEditMode) {
                         setEditingTest({ ...editingTest, lugar: e.target.value });
