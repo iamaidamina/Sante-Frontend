@@ -33,12 +33,30 @@ const CitasPage = () => {
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState(null);
+  const [especialidades, setEspecialidades] = useState([]);
   const navigate = useNavigate();
 
+  //Carga Citas
   useEffect(() => {
     fetchAppointments();
   }, []);
 
+  //Carga Especialidades
+  useEffect(() => {
+    fetchEspecialidades();
+  }, []);
+  
+  const fetchEspecialidades = async () =>{
+    const token = localStorage.getItem('token');
+    fetch('https://sante-backend-production.up.railway.app/api/catalog/especialidades', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(setEspecialidades)
+      .catch(err => console.error(err));
+
+  }
+  
   const fetchAppointments = async () => {
     try {
       setIsLoading(true);
@@ -184,14 +202,14 @@ const CitasPage = () => {
   };
 
   const getSpecialtyName = (id) => {
-  const specialties = {
-    1: 'Medicina General',
-    2: 'Odontología', 
-    3: 'Cardiología',
-    4: 'Geriatría'
+    const specialties = {
+      1: 'Medicina General',
+      2: 'Odontología',
+      3: 'Cardiología',
+      4: 'Geriatría'
+    };
+    return specialties[id] || id || 'N/A';
   };
-  return specialties[id] || id || 'N/A';
-};
 
   // ✅ Now safe to return early
   if (isLoading) {
@@ -329,6 +347,7 @@ const CitasPage = () => {
               <h3>{isEditMode ? 'Editar Cita' : 'Nueva Cita'}</h3>
               <button
                 onClick={() => {
+                  fetchEspecialidades();
                   setIsModalOpen(false);
                   setIsEditMode(false);
                   setEditingAppointment(null);
@@ -361,9 +380,7 @@ const CitasPage = () => {
                     style={styles.modalInput}
                     value={isEditMode ? editingAppointment?.id_especialidad || '' : newAppointment.id_especialidad || ''}
                     onChange={(e) => {
-                      // ✅ PARSE TO NUMBER
                       const numberValue = parseInt(e.target.value) || null;
-
                       if (isEditMode) {
                         setEditingAppointment({ ...editingAppointment, id_especialidad: numberValue });
                       } else {
@@ -372,10 +389,15 @@ const CitasPage = () => {
                     }}
                   >
                     <option value="">Seleccionar especialidad</option>
-                    <option value="1">Medicina General</option>
-                    <option value="2">Odontología</option>
-                    <option value="3">Cardiología</option>
-                    <option value="4">Geriatría</option>
+
+                    {especialidades.map((esp) => (
+                      <option
+                        key={esp.id_especialidad}
+                        value={esp.id_especialidad}
+                      >
+                        {esp.nombre}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
