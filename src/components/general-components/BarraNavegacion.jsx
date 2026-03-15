@@ -8,6 +8,7 @@ import Cookies from 'universal-cookie';
 import user from '../../assets/user-icon.png';
 import recurso1 from '../../assets/Logo-sante-sinfondo.svg';
 import socket from '../../socket';
+import { fetchWithAuth } from '../../utils/fetchWithAuth';
 
 const getUsernameFromToken = (token) => {
   try {
@@ -23,7 +24,7 @@ const getUsernameFromToken = (token) => {
 export default function BarraNavegacion() {
   const cookies = new Cookies();
   const navigate = useNavigate(); // ✅ FIXED: Now works with import
-  const token = localStorage.getItem('token'); // ✅ Use localStorage like login
+  const token = localStorage.getItem('access_token'); // ✅ Use localStorage like login
   const username =
     cookies.get('username') ||
     localStorage.getItem('username') ||
@@ -38,16 +39,9 @@ export default function BarraNavegacion() {
 
 const cerrarSesion = async () => {
   try {
-
-    const token = localStorage.getItem("token");
-
     if (token) {
-      await fetch("'https://sante-backend-production.up.railway.app/api/users/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
+      await fetchWithAuth('/api/users/logout', {
+        method: 'POST'
       });
     }
 
@@ -60,7 +54,7 @@ const cerrarSesion = async () => {
   // limpiar almacenamiento
   cookies.remove('token', { path: '/' });
   cookies.remove('username', { path: '/' });
-  localStorage.removeItem('token');
+  localStorage.removeItem('access_token');
   localStorage.removeItem('username');
   localStorage.removeItem('email');
   localStorage.removeItem('user_id');

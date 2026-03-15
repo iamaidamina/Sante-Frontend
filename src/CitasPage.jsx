@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import Select from 'react-select';
+import { fetchWithAuth } from './utils/fetchWithAuth';
 const CitasPage = () => {
   // 4. Create internal state
   /*
@@ -47,33 +48,30 @@ const CitasPage = () => {
   }, []);
   
   const fetchEspecialidades = async () =>{
-    const token = localStorage.getItem('token');
-    fetch('https://sante-backend-production.up.railway.app/api/catalog/especialidades', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(setEspecialidades)
-      .catch(err => console.error(err));
+    try {
+      const response = await fetchWithAuth('/api/catalog/especialidades');
+      if (!response.ok) {
+        throw new Error('Error al cargar especialidades');
+      }
+      const data = await response.json();
+      setEspecialidades(data);
+    } catch (err) {
+      console.error(err);
+    }
 
   }
   
   const fetchAppointments = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
         setError('No token found. Please login again.');
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch('https://sante-backend-production.up.railway.app/api/appointments', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetchWithAuth('/api/appointments');
 
       if (!response.ok) {
         throw new Error('Error al cargar citas');
@@ -94,15 +92,9 @@ const CitasPage = () => {
     e.preventDefault();
     console.log('🛠️ Creating:', newAppointment);
     try {
-      const token = localStorage.getItem('token');
-
-      const response = await fetch('https://sante-backend-production.up.railway.app/api/appointments', {
+      const response = await fetchWithAuth('/api/appointments', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newAppointment),
+        body: JSON.stringify(newAppointment)
       });
 
       if (response.ok) {
@@ -127,13 +119,8 @@ const CitasPage = () => {
     if (!confirm('¿Eliminar esta cita?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-
-      await fetch(`https://sante-backend-production.up.railway.app/api/appointments/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      await fetchWithAuth(`/api/appointments/${id}`, {
+        method: 'DELETE'
       });
 
       fetchAppointments(); // Refresh list
@@ -174,17 +161,11 @@ const CitasPage = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-
-      const response = await fetch(
-        `https://sante-backend-production.up.railway.app/api/appointments/${editingAppointment.id_cita}`,
+      const response = await fetchWithAuth(
+        `/api/appointments/${editingAppointment.id_cita}`,
         {
           method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(editingAppointment),
+          body: JSON.stringify(editingAppointment)
         }
       );
 

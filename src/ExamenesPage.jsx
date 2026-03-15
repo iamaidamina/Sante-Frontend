@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import Select from 'react-select';
+import { fetchWithAuth } from './utils/fetchWithAuth';
 const ExamenesPage = ({ studentsData }) => {
   /*
   // 4. Create internal state
@@ -40,20 +41,14 @@ const ExamenesPage = ({ studentsData }) => {
   const fetchTests = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
         setError('No token found. Please login again.');
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch('https://sante-backend-production.up.railway.app/api/tests', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetchWithAuth('/api/tests');
 
       if (!response.ok) {
         throw new Error('Error al cargar examenes');
@@ -73,15 +68,9 @@ const ExamenesPage = ({ studentsData }) => {
     e.preventDefault();
     console.log('🛠️ Creating:', newTest);
     try {
-      const token = localStorage.getItem('token');
-
-      const response = await fetch('https://sante-backend-production.up.railway.app/api/tests', {
+      const response = await fetchWithAuth('/api/tests', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newTest),
+        body: JSON.stringify(newTest)
       });
 
       if (response.ok) {
@@ -106,13 +95,8 @@ const ExamenesPage = ({ studentsData }) => {
     if (!confirm('¿Eliminar este examén?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-
-      await fetch(`https://sante-backend-production.up.railway.app/api/tests/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      await fetchWithAuth(`/api/tests/${id}`, {
+        method: 'DELETE'
       });
 
       fetchTests(); // Refresh list
@@ -152,17 +136,11 @@ const ExamenesPage = ({ studentsData }) => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-
-      const response = await fetch(
-        `https://sante-backend-production.up.railway.app/api/tests/${editingTest.id_test}`,
+      const response = await fetchWithAuth(
+        `/api/tests/${editingTest.id_test}`,
         {
           method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(editingTest),
+          body: JSON.stringify(editingTest)
         }
       );
 

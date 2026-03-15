@@ -41,57 +41,72 @@ const LoginPage = () => {
     
   };
   */
-const handleLogin = async (e) => {
-  e.preventDefault();
-  const data = { email, password };
-  try {
-    const response = await fetch('https://sante-backend-production.up.railway.app/api/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    });
-    const result = await response.json().catch(() => ({}));
-    if (response.ok) {
-      const token = result?.token;
-      if (!token) {
-        setLoginError('Respuesta de login invalida: no se recibio token');
-        return;
-      }
-      const tokenUsername = getUsernameFromToken(token);
-      const username =
-        result?.user?.username ||
-        result?.user?.nombres ||
-        tokenUsername ||
-        email.split('@')[0];
-      const userId = result?.user?.id_usuario;
-      localStorage.setItem('token', token);
-      localStorage.setItem('email', email);
-      localStorage.setItem('username', username);
-      if (userId) {
-        localStorage.setItem('user_id', String(userId));
-      }
-      // 🔵 Forzar reconexión del socket
-      socket.disconnect();
-      socket.connect();
-      socket.off("connect");
-      socket.once("connect", () => {
-        console.log("Socket conectado:", socket.id);
-        if (userId) {
-          socket.emit("join_user_room", userId);
-          console.log("Uniendo usuario a room:", userId);
-        }
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const data = { email, password };
+    try {
+      const response = await fetch('https://sante-backend-production.up.railway.app/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
       });
-      navigate('/medicamentos');
-    } else {
-      setLoginError(result.message || 'Error en login');
-    }
-  } catch (error) {
-    setLoginError('Error de conexión');
+      const result = await response.json().catch(() => ({}));
+      if (response.ok) {
+        // Compatibilidad: algunos backends devuelven `token` en lugar de `access_token`.
+        const accessToken = result?.access_token || result?.token;
+        const refreshToken = result?.refresh_token || null;
 
-  }
-};
+        if (!accessToken) {
+          setLoginError('Respuesta de login invalida: no se recibio access token');
+          return;
+        }
+
+        const tokenUsername = getUsernameFromToken(accessToken);
+
+        const username =
+          result?.user?.username ||
+          result?.user?.nombres ||
+          tokenUsername ||
+          email.split('@')[0];
+
+        const userId = result?.user?.id_usuario;
+
+        localStorage.setItem('access_token', accessToken);
+        if (refreshToken) {
+          localStorage.setItem('refresh_token', refreshToken);
+        } else {
+          localStorage.removeItem('refresh_token');
+        }
+        // Mantiene compatibilidad temporal con codigo viejo o sesiones previas.
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('email', email);
+        localStorage.setItem('username', username);
+
+        if (userId) {
+          localStorage.setItem('user_id', String(userId));
+        }
+        // 🔵 Forzar reconexión del socket
+        socket.disconnect();
+        socket.connect();
+        socket.off("connect");
+        socket.once("connect", () => {
+          console.log("Socket conectado:", socket.id);
+          if (userId) {
+            socket.emit("join_user_room", userId);
+            console.log("Uniendo usuario a room:", userId);
+          }
+        });
+        navigate('/medicamentos');
+      } else {
+        setLoginError(result.message || 'Error en login');
+      }
+    } catch (error) {
+      setLoginError('Error de conexión');
+
+    }
+  };
 
   return (
     <div style={styles.pageWrapper} className="pageWrapper">

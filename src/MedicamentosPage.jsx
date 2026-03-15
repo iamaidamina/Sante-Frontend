@@ -7,7 +7,7 @@ import { faPhoneVolume, faEnvelope, faEdit, faCancel, faPlus } from '@fortawesom
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
-
+import { fetchWithAuth } from "./utils/fetchWithAuth";
 //const MedicamentosPage = ({ studentsData }) =>
 const MedicamentosPage = () => {
   // 4. Create internal state
@@ -33,20 +33,14 @@ const MedicamentosPage = () => {
   const fetchMedications = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       if (!token) {
         setError('No token found. Please login again.');
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch('https://sante-backend-production.up.railway.app/api/medications', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetchWithAuth('/api/medications');
 
       if (!response.ok) {
         throw new Error('Error al cargar medicamentos');
@@ -66,15 +60,9 @@ const MedicamentosPage = () => {
     e.preventDefault();
     console.log('🛠️ Creating:', newMedication);
     try {
-      const token = localStorage.getItem('token');
-
-      const response = await fetch('https://sante-backend-production.up.railway.app/api/medications', {
+      const response = await fetchWithAuth('/api/medications', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newMedication),
+        body: JSON.stringify(newMedication)
       });
 
       if (response.ok) {
@@ -93,13 +81,8 @@ const MedicamentosPage = () => {
     if (!confirm('¿Eliminar este medicamento?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-
-      await fetch(`https://sante-backend-production.up.railway.app/api/medications/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      await fetchWithAuth(`/api/medications/${id}`, {
+        method: 'DELETE'
       });
 
       fetchMedications(); // Refresh list
@@ -114,18 +97,18 @@ const MedicamentosPage = () => {
     setIsEditMode(true);
     setIsModalOpen(true);  // ← THIS OPENS MODAL
     */
-   const cleanMedication = {
-    id_medicamento: id,
-    nombre: medication.nombre || '',
-    descripcion: medication.descripcion || '',
-   id_frecuencia: medication.id_frecuencia ? parseInt(medication.id_frecuencia, 10) : 1,
-    almacenamiento: medication.almacenamiento || '',
-    estado: medication.estado || 'activo'
-  };
-  
-  setEditingMedication(cleanMedication);
-  setIsEditMode(true);
-  setIsModalOpen(true);
+    const cleanMedication = {
+      id_medicamento: id,
+      nombre: medication.nombre || '',
+      descripcion: medication.descripcion || '',
+      id_frecuencia: medication.id_frecuencia ? parseInt(medication.id_frecuencia, 10) : 1,
+      almacenamiento: medication.almacenamiento || '',
+      estado: medication.estado || 'activo'
+    };
+
+    setEditingMedication(cleanMedication);
+    setIsEditMode(true);
+    setIsModalOpen(true);
   };
 
   const handleUpdate = async (e) => {
@@ -137,17 +120,11 @@ const MedicamentosPage = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-
-      const response = await fetch(
-        `https://sante-backend-production.up.railway.app/api/medications/${editingMedication.id_medicamento}`,
+      const response = await fetchWithAuth(
+        `/api/medications/${editingMedication.id_medicamento}`,
         {
           method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(editingMedication),
+          body: JSON.stringify(editingMedication)
         }
       );
 
