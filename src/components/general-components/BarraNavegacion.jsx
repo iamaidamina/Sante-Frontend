@@ -36,17 +36,37 @@ export default function BarraNavegacion() {
     }
   }, [navigate, token]); // ✅ Added token dependency
 
-  const cerrarSesion = () => {
-    socket.disconnect();
-    // ✅ Clean BOTH storage methods for consistency
-    cookies.remove('token', { path: '/' });
-    cookies.remove('username', { path: '/' });
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('email'); // If you store email here too
-    localStorage.removeItem('user_id');
-    navigate('/', { replace: true });
-  };
+const cerrarSesion = async () => {
+  try {
+
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      await fetch("'https://sante-backend-production.up.railway.app/api/users/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error("Error cerrando sesión", error);
+  }
+
+  socket.disconnect();
+
+  // limpiar almacenamiento
+  cookies.remove('token', { path: '/' });
+  cookies.remove('username', { path: '/' });
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  localStorage.removeItem('email');
+  localStorage.removeItem('user_id');
+
+  navigate('/', { replace: true });
+};
 
   // ✅ Show loading/protected state
   if (!token) return null;
