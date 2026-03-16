@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import illustrationLeft from './assets/illustrationLeft.svg'
 import socket from './socket';
+import { Link } from "react-router-dom";
 
 const getUsernameFromToken = (token) => {
   try {
@@ -166,9 +167,7 @@ const LoginPage = () => {
                 </div>
                 {/* NEW: Forgot Password Link */}
                 <div style={styles.forgotPasswordContainer}>
-                  <a href="/registro" style={styles.registrationLink}>
-                    Registrarse
-                  </a>
+                  <Link to='/registro' className="link-mapa" style={styles.registrationLink}>Registrarse</Link>
                 </div>
               </form>
             </div>
