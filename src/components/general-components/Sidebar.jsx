@@ -18,7 +18,7 @@ const Sidebar = () => {
     <div className='sidebar'  style={{ display: 'flex', height: '100%', overflow: 'scroll initial' }}>
       <CDBSidebar data-toggle="collapse" textColor="#fff" backgroundColor="#055882">
         <CDBSidebarHeader onClick={()=>setEstado(estado ? false : true)} prefix={<i className="fa fa-bars fa-large"></i>}>
-          <a href="/menuprincipal" className="text-decoration-none" style={{ color: 'inherit' }}>
+          <a href="/" className="text-decoration-none" style={{ color: 'inherit' }}>
             SANTÉ
           </a>
         </CDBSidebarHeader>
