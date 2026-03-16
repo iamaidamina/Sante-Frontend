@@ -1,7 +1,11 @@
-import React, { useState } from 'react'; // 1. Added useState
+import React, { useState, useEffect } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
 import illustrationRight from './assets/illustrationRight.svg'
+import TermsModal from "./components/TermsModal";
+import ReCAPTCHA from "react-google-recaptcha";
+
+
 const RegistrationPage = () => {
   // 4. Create internal state
   const [nombres, setNombres] = useState('');
@@ -12,9 +16,17 @@ const RegistrationPage = () => {
   const [email, setEmail] = useState('');
   const [registerError, setRegisterError] = useState(''); // Cambia loginError por registerError
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [recaptchaValue, setRecaptchaValue] = useState(null);
+  const configuredRecaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey = configuredRecaptchaKey || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+  const isUsingTestRecaptchaKey = !configuredRecaptchaKey;
   const navigate = useNavigate();
 
-  React.useEffect(() => {
+
+
+  useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     //document.body.style.overflow = 'hidden';
@@ -26,14 +38,36 @@ const RegistrationPage = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    const data = {
-      nombres,
-      apellidos,
-      fecha_nacimiento: fechaNacimiento,
-      username,
-      email,
-      password
-    };
+    // 🔒 Validar aceptación de términos
+    if (!termsAccepted) {
+      setRegisterError("Debes aceptar los términos y condiciones");
+      return;
+    }
+
+    if (!recaptchaValue) {
+      setRegisterError("Debes completar el reCAPTCHA");
+      return;
+    }
+
+    setRegisterError("");
+    setIsLoading(true);
+
+const data = {
+  nombres,
+  apellidos,
+  fecha_nacimiento: fechaNacimiento,
+  username,
+  email,
+  password,
+  terms_accepted: termsAccepted,
+  recaptcha_token: recaptchaValue,
+  recaptchaToken: recaptchaValue,
+  captcha_token: recaptchaValue,
+  captchaToken: recaptchaValue,
+  captcha: recaptchaValue,
+  token: recaptchaValue,
+  'g-recaptcha-response': recaptchaValue
+};
 
     try {
       const response = await fetch('https://sante-backend-production.up.railway.app/api/users/register', {
@@ -163,11 +197,46 @@ const RegistrationPage = () => {
 
                 {/* Checkbox: Términos y Condiciones */}
                 <div style={styles.checkboxContainer}>
-                  <input type="checkbox" id="terms" style={styles.checkbox} required />
-                  <label htmlFor="terms" style={styles.checkboxLabel}>
-                    He leído y acepto los <a href="#terms" style={styles.termsLink}>términos y condiciones</a>
+
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    readOnly
+                    style={styles.checkbox}
+                  />
+
+                  <label style={styles.checkboxLabel}>
+                    {termsAccepted ? "✔ Términos aceptados" : "He leído y acepto los "}
+                    {!termsAccepted && (
+                      <span
+                        style={styles.termsLink}
+                        onClick={() => setShowTerms(true)}
+                      >
+                        términos y condiciones
+                      </span>
+                    )}
                   </label>
                 </div>
+
+                <div style={styles.recaptchaWrapper}>
+                  <ReCAPTCHA
+                    sitekey={recaptchaSiteKey}
+                    onChange={(value) => {
+                      setRecaptchaValue(value);
+                      if (value) {
+                        setRegisterError("");
+                      }
+                    }}
+                    onExpired={() => setRecaptchaValue(null)}
+                    onErrored={() => setRecaptchaValue(null)}
+                  />
+                </div>
+
+                {isUsingTestRecaptchaKey && (
+                  <p style={styles.recaptchaHint}>
+                    Usando clave de prueba. Configura VITE_RECAPTCHA_SITE_KEY en .env para produccion.
+                  </p>
+                )}
 
                 {registerError && <div style={styles.errorMessage}>{registerError}</div>}
                 {/* ÉXITO - Verde */}
@@ -183,11 +252,23 @@ const RegistrationPage = () => {
                 )}
 
                 <div style={styles.buttonWrapper}>
-                  <button disabled={isLoading} type="submit">
+                  <button disabled={isLoading || !recaptchaValue} type="submit">
                     {isLoading ? 'Registrando...' : 'Registrarse'}
                   </button>
                 </div>
               </form>
+              {showTerms && (
+
+                <TermsModal
+                  onAccept={() => {
+                    setTermsAccepted(true);
+                    setShowTerms(false);
+                    setRegisterError("");
+                  }}
+                  onClose={() => setShowTerms(false)}
+                />
+
+              )}
             </div>
             {/* END: Gradient Border Frame */}
 
@@ -239,7 +320,7 @@ const styles = {
   buttonWrapper: {
     display: 'flex',
     justifyContent: 'center', // Centers the smaller button
-    marginTop: '8px',
+    marginTop: '1px',
   },
   logoIcon: { display: 'inline-block', marginBottom: '24px' },
   loginTitle: { fontFamily: "'Syne', sans-serif", fontSize: '32px', fontWeight: '800', color: '#0A4D68', margin: '0 0 8px 0' },
@@ -331,8 +412,8 @@ const styles = {
   checkboxContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
-    marginTop: '5px',
+    gap: '5px',
+    marginTop: '1px',
     cursor: 'pointer',
   },
   checkbox: {
@@ -349,6 +430,18 @@ const styles = {
     color: '#088395',
     fontWeight: '600',
     textDecoration: 'underline',
+  },
+  recaptchaWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '2px',
+    marginBottom: '2px',
+  },
+  recaptchaHint: {
+    margin: 0,
+    fontSize: '12px',
+    color: '#64748b',
+    textAlign: 'center',
   },
 };
 

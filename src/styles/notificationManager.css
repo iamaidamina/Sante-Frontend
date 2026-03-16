@@ -1,0 +1,17 @@
+.uv-toast-content {
+  text-align: center;
+}
+
+.uv-toast-image {
+  width: 70px;
+  margin: 8px auto;
+}
+
+.uv-toast-buy-link {
+  background: #ff9800;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+}
