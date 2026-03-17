@@ -80,7 +80,10 @@ const data = {
 
       if (response.ok) {
         setRegisterSuccess(true);
-        navigate('/'); // O a login si prefieres
+        setRegisterError('');
+        setTimeout(() => {
+          navigate('/');
+        }, 4000);
       } else {
         const errorData = await response.json();
         setRegisterError(errorData.message || 'Error en registro');
@@ -247,7 +250,7 @@ const data = {
                     color: '#065f46',
                     border: '1px solid #a7f3d0'
                   }}>
-                    ¡Usuario registrado exitosamente!
+                    Registro exitoso. Revisa tu correo para confirmar tu cuenta antes de iniciar sesion.
                   </div>
                 )}
 
