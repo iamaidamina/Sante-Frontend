@@ -159,12 +159,13 @@ const LoginPage = () => {
                   </button>
                 </div>
 
-                {/* NEW: Forgot Password Link */}
+                {/* NEW: Forgot Password Link 
                 <div style={styles.forgotPasswordContainer}>
                   <a href="#forgot" style={styles.forgotPasswordLink}>
                     ¿Olvidó la contraseña?
                   </a>
                 </div>
+                */}
                 {/* NEW: Forgot Password Link */}
                 <div style={styles.forgotPasswordContainer}>
                   <Link to='/registro' className="link-mapa" style={styles.registrationLink}>Registrarse</Link>
