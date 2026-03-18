@@ -1,4 +1,4 @@
-const API_URL = "https://sante-backend-production.up.railway.app";
+const API_URL = "https://sante-backend-production2.up.railway.app";
 
 export async function fetchWithAuth(endpoint, options = {}) {
 
