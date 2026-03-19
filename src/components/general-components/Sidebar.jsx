@@ -40,6 +40,9 @@ const Sidebar = () => {
             <Link to="/entregas">
               <CDBSidebarMenuItem icon="car">Entregas</CDBSidebarMenuItem>
             </Link>
+            <Link to="/guia-usuario">
+              <CDBSidebarMenuItem icon="book">Guia de usuario</CDBSidebarMenuItem>
+            </Link>
           </CDBSidebarMenu>
         </CDBSidebarContent>
 

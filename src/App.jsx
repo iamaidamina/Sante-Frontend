@@ -7,6 +7,8 @@ import EntregasPage from './EntregasPage';
 import CitasPage from './CitasPage';
 import ReportesPage from './ReportesPage';
 import ExamenesPage from './ExamenesPage';
+import GuiaUsuarioPage from './GuiaUsuarioPage';
+import InformacionUsuarioPage from './InformacionUsuarioPage';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NotificationManager from "./components/NotificationManager";
@@ -76,6 +78,8 @@ export function App() {
           path="/reportes" 
           element={<ReportesPage studentsData={studentsData} />} 
         />
+        <Route exact path="/guia-usuario" element={<GuiaUsuarioPage />} />
+        <Route exact path="/informacion-usuario" element={<InformacionUsuarioPage />} />
         {/* Catch-all: Redirect unknown routes back to Login */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

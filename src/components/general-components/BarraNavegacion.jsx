@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ FIXED: Import useNavigate
 import { Navbar, Nav, NavDropdown, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/general-components/navbarMenuPrincipal.css';
 import Cookies from 'universal-cookie';
 import user from '../../assets/user-icon.png';
@@ -67,7 +67,7 @@ const cerrarSesion = async () => {
 
   return (
     <div className='navbar-tam'>
-      <Navbar className='navbar' variant='dark' expand="lg" fluid>
+      <Navbar className='navbar' variant='dark' expand="lg">
         <Navbar.Brand className='navbar-brand' href="/">
           <img
             className='imagen-logo'
@@ -90,6 +90,13 @@ const cerrarSesion = async () => {
               id="basic-nav-dropdown"
               className='justify-content-end'
             >
+              <NavDropdown.Item
+                className='dropdown-item navbar-dropdown'
+                onClick={() => navigate('/informacion-usuario')}
+              >
+                <FontAwesomeIcon icon={faCircleUser} />
+                &nbsp;&nbsp;Ver informacion del usuario
+              </NavDropdown.Item>
               <NavDropdown.Item className='dropdown-item navbar-dropdown'>
                 <Button
                   variant="light"

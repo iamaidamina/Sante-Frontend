@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/termsModal.css";
 
-const TermsModal = ({ onAccept, onClose }) => {
+const TermsModal = ({ onAccept, onClose, readOnly = false }) => {
 
   const [termsRead, setTermsRead] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -70,24 +70,32 @@ const TermsModal = ({ onAccept, onClose }) => {
           </p>
         )}
 
+        {readOnly && (
+          <p className="terms-modal-read-success">
+            Modo lectura: estos son los términos y condiciones aceptados previamente.
+          </p>
+        )}
+
         <div className="terms-modal-actions">
 
-          <button
-            disabled={!termsRead}
-            onClick={onAccept}
-            style={{
-              opacity: termsRead ? 1 : 0.5
-            }}
-            className="terms-modal-button"
-          >
-            Aceptar
-          </button>
+          {!readOnly && (
+            <button
+              disabled={!termsRead}
+              onClick={onAccept}
+              style={{
+                opacity: termsRead ? 1 : 0.5
+              }}
+              className="terms-modal-button"
+            >
+              Aceptar
+            </button>
+          )}
 
           <button
             onClick={onClose}
             className="terms-modal-cancel-button"
           >
-            Cancelar
+            {readOnly ? 'Cerrar' : 'Cancelar'}
           </button>
 
         </div>
