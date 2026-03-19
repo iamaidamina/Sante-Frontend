@@ -19,6 +19,13 @@ const formatDate = (dateString) => {
   }
 };
 
+const normalizeDateInput = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().split('T')[0];
+};
+
 const getUserDataFromToken = (token) => {
   try {
     const payload = token?.split('.')[1];
@@ -39,7 +46,18 @@ const getUserDataFromToken = (token) => {
 export default function InformacionUsuarioPage() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [formData, setFormData] = useState({
+    nombres: '',
+    apellidos: '',
+    username: '',
+    fecha_nacimiento: '',
+    telefono_celular: '',
+  });
+  const todayIso = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     document.body.style.margin = '0';
@@ -57,6 +75,13 @@ export default function InformacionUsuarioPage() {
         if (response.ok) {
           const data = await response.json();
           setUserData(data);
+          setFormData({
+            nombres: data?.nombres || '',
+            apellidos: data?.apellidos || '',
+            username: data?.username || localStorage.getItem('username') || '',
+            fecha_nacimiento: normalizeDateInput(data?.fecha_nacimiento),
+            telefono_celular: data?.telefono_celular || '',
+          });
         } else {
           console.error('Error fetching user data');
           setUserData(null);
@@ -71,6 +96,95 @@ export default function InformacionUsuarioPage() {
 
     fetchUserData();
   }, []);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormErrors((prev) => ({ ...prev, [name]: '' }));
+  };
+
+  const validateProfileForm = () => {
+    const errors = {};
+    const phoneValue = formData.telefono_celular.trim();
+    const digitsOnly = phoneValue.replace(/\D/g, '');
+
+    if (!formData.nombres.trim()) errors.nombres = 'El nombre es obligatorio.';
+    if (!formData.apellidos.trim()) errors.apellidos = 'El apellido es obligatorio.';
+    if (!formData.username.trim()) errors.username = 'El nombre de usuario es obligatorio.';
+    if (!formData.fecha_nacimiento.trim()) errors.fecha_nacimiento = 'La fecha de nacimiento es obligatoria.';
+    if (!formData.telefono_celular.trim()) {
+      errors.telefono_celular = 'El telefono es obligatorio.';
+    } else if (!/^\+?[0-9\s-]+$/.test(phoneValue) || digitsOnly.length < 7 || digitsOnly.length > 15) {
+      errors.telefono_celular = 'Ingresa un telefono valido (7 a 15 digitos, opcional +).';
+    }
+
+    if (formData.fecha_nacimiento && formData.fecha_nacimiento > todayIso) {
+      errors.fecha_nacimiento = 'La fecha de nacimiento no puede ser futura.';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleProfileSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!validateProfileForm()) {
+      setSaveStatus({ type: 'error', message: 'Completa todos los campos obligatorios antes de guardar.' });
+      return;
+    }
+
+    const payload = {
+      nombres: formData.nombres.trim(),
+      apellidos: formData.apellidos.trim(),
+      username: formData.username.trim(),
+      fecha_nacimiento: formData.fecha_nacimiento,
+      telefono_celular: formData.telefono_celular.trim(),
+    };
+
+    setSaving(true);
+    setSaveStatus({ type: '', message: '' });
+
+    try {
+      let response = await fetchWithAuth('/api/users/me', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+
+      if (response && (response.status === 404 || response.status === 405)) {
+        response = await fetchWithAuth('/api/users/me', {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!response) {
+        setSaveStatus({ type: 'error', message: 'No fue posible guardar. Intenta iniciar sesion de nuevo.' });
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        setSaveStatus({ type: 'error', message: errorData?.message || 'No se pudieron guardar los cambios.' });
+        return;
+      }
+
+      const updatedFromApi = await response.json().catch(() => null);
+      const updatedUser = {
+        ...(userData || {}),
+        ...payload,
+        ...(updatedFromApi || {}),
+      };
+
+      setUserData(updatedUser);
+      localStorage.setItem('username', updatedUser.username || payload.username);
+      setSaveStatus({ type: 'success', message: 'Datos actualizados correctamente.' });
+    } catch {
+      setSaveStatus({ type: 'error', message: 'Ocurrio un error al actualizar tus datos.' });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const accessToken = localStorage.getItem('access_token');
   const tokenData = getUserDataFromToken(accessToken);
@@ -181,6 +295,93 @@ export default function InformacionUsuarioPage() {
                       </article>
                     ))}
                   </div>
+                </section>
+              )}
+
+              {!loading && (
+                <section style={styles.section}>
+                  <h2 style={styles.sectionTitle}>Editar datos del perfil</h2>
+
+                  <form style={styles.editForm} onSubmit={handleProfileSubmit} noValidate>
+                    <div style={styles.inputGrid}>
+                      <div style={styles.inputGroup}>
+                        <label style={styles.inputLabel} htmlFor="nombres">Nombres *</label>
+                        <input
+                          id="nombres"
+                          name="nombres"
+                          type="text"
+                          value={formData.nombres}
+                          onChange={handleInputChange}
+                          style={styles.inputField}
+                        />
+                        {formErrors.nombres && <p style={styles.inputError}>{formErrors.nombres}</p>}
+                      </div>
+
+                      <div style={styles.inputGroup}>
+                        <label style={styles.inputLabel} htmlFor="apellidos">Apellidos *</label>
+                        <input
+                          id="apellidos"
+                          name="apellidos"
+                          type="text"
+                          value={formData.apellidos}
+                          onChange={handleInputChange}
+                          style={styles.inputField}
+                        />
+                        {formErrors.apellidos && <p style={styles.inputError}>{formErrors.apellidos}</p>}
+                      </div>
+
+                      <div style={styles.inputGroup}>
+                        <label style={styles.inputLabel} htmlFor="username">Nombre de usuario *</label>
+                        <input
+                          id="username"
+                          name="username"
+                          type="text"
+                          value={formData.username}
+                          onChange={handleInputChange}
+                          style={styles.inputField}
+                        />
+                        {formErrors.username && <p style={styles.inputError}>{formErrors.username}</p>}
+                      </div>
+
+                      <div style={styles.inputGroup}>
+                        <label style={styles.inputLabel} htmlFor="fecha_nacimiento">Fecha de nacimiento *</label>
+                        <input
+                          id="fecha_nacimiento"
+                          name="fecha_nacimiento"
+                          type="date"
+                          value={formData.fecha_nacimiento}
+                          max={todayIso}
+                          onChange={handleInputChange}
+                          style={styles.inputField}
+                        />
+                        {formErrors.fecha_nacimiento && <p style={styles.inputError}>{formErrors.fecha_nacimiento}</p>}
+                      </div>
+
+                      <div style={styles.inputGroup}>
+                        <label style={styles.inputLabel} htmlFor="telefono_celular">Telefono *</label>
+                        <input
+                          id="telefono_celular"
+                          name="telefono_celular"
+                          type="text"
+                          inputMode="tel"
+                          placeholder="Ej: +573001234567"
+                          pattern="^\\+?[0-9\\s-]+$"
+                          value={formData.telefono_celular}
+                          onChange={handleInputChange}
+                          style={styles.inputField}
+                        />
+                        {formErrors.telefono_celular && <p style={styles.inputError}>{formErrors.telefono_celular}</p>}
+                      </div>
+                    </div>
+
+                    <button type="submit" style={styles.saveButton} disabled={saving}>
+                      {saving ? 'Guardando cambios...' : 'Guardar cambios'}
+                    </button>
+
+                    {saveStatus.message && (
+                      <p style={saveStatus.type === 'success' ? styles.saveSuccess : styles.saveError}>{saveStatus.message}</p>
+                    )}
+                  </form>
                 </section>
               )}
 
@@ -395,6 +596,73 @@ const styles = {
     padding: '12px 18px',
     cursor: 'pointer',
     boxShadow: '0 8px 18px rgba(8, 131, 149, 0.18)',
+  },
+  editForm: {
+    background: '#ffffff',
+    borderRadius: '20px',
+    border: '1px solid #e2e8f0',
+    padding: '22px',
+    boxShadow: '0 6px 18px rgba(15, 23, 42, 0.05)',
+  },
+  inputGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+    gap: '16px',
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  inputLabel: {
+    fontSize: '14px',
+    color: '#334155',
+    fontWeight: '700',
+  },
+  inputField: {
+    border: '1px solid #cbd5e1',
+    borderRadius: '10px',
+    padding: '12px 14px',
+    fontSize: '15px',
+    color: '#0f172a',
+    outline: 'none',
+  },
+  inputError: {
+    margin: 0,
+    color: '#b91c1c',
+    fontSize: '13px',
+    fontWeight: '600',
+  },
+  saveButton: {
+    marginTop: '18px',
+    border: 'none',
+    borderRadius: '12px',
+    background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
+    color: '#ffffff',
+    fontSize: '15px',
+    fontWeight: '700',
+    padding: '11px 16px',
+    cursor: 'pointer',
+  },
+  saveSuccess: {
+    margin: '12px 0 0 0',
+    color: '#065f46',
+    background: '#d1fae5',
+    border: '1px solid #a7f3d0',
+    borderRadius: '10px',
+    padding: '10px 12px',
+    fontSize: '14px',
+    fontWeight: '600',
+  },
+  saveError: {
+    margin: '12px 0 0 0',
+    color: '#991b1b',
+    background: '#fee2e2',
+    border: '1px solid #fecaca',
+    borderRadius: '10px',
+    padding: '10px 12px',
+    fontSize: '14px',
+    fontWeight: '600',
   },
   noticeBox: {
     background: 'linear-gradient(135deg, #0A4D68 0%, #0f766e 100%)',
