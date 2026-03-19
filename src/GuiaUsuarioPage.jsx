@@ -114,7 +114,7 @@ export default function GuiaUsuarioPage() {
               <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Recomendaciones</h2>
                 <div style={styles.recommendationBox}>
-                  <p style={styles.recommendationText}>Confirma tu correo despues del registro para activar la cuenta.</p>
+                  <p style={styles.recommendationText}>Agrega tu numero o actualizalo para recibir notificaciones por WhatsApp.</p>
                   <p style={styles.recommendationText}>Mantente atento a notificaciones del sistema para no perder citas, examenes o entregas.</p>
                   <p style={styles.recommendationText}>Cierra sesion al terminar si estas usando un equipo compartido.</p>
                 </div>
@@ -147,6 +147,7 @@ const styles = {
     height: '100vh',
     width: '100%',
     minWidth: 0,
+    overflowX: 'hidden',
     overflowY: 'auto',
   },
   mainContent: {

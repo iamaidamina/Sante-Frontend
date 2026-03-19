@@ -429,6 +429,7 @@ const styles = {
     margin: 0,
     padding: 0,
     backgroundColor: '#f1f5f9',
+    overflowX: 'hidden',
   },
   rightContainer: {
     gridColumn: '2',
@@ -437,6 +438,7 @@ const styles = {
     minWidth: 0,
     height: '100vh',
     width: '100%',
+    overflowX: 'hidden',
     overflowY: 'auto',
   },
   mainContent: {
@@ -445,12 +447,14 @@ const styles = {
     width: '100%',
     padding: '100px 200px 80px 200px',
     boxSizing: 'border-box',
+    minWidth: 0,
   },
   dashboard: {
     width: '100%',
     minHeight: '100vh',
     background: '#f8fafc',
     fontFamily: "'DM Sans', sans-serif",
+    minWidth: 0,
   },
   header: {
     background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
@@ -494,6 +498,8 @@ const styles = {
   },
   main: {
     width: '100%',
+    maxWidth: '1400px',
+    margin: '0 auto',
     padding: '32px',
     boxSizing: 'border-box',
   },
