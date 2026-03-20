@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
-import illustrationLeft from './assets/illustrationLeft.svg'
+import illustrationLeft from './assets/LogoAgenteVirtual.png'
 import socket from './socket';
 import { Link } from "react-router-dom";
 
@@ -116,18 +116,20 @@ const LoginPage = () => {
         <div style={styles.rightSide} className="rightSide">
           <div style={styles.loginCard}>
             <div style={styles.loginHeader}>
+              <h5>Iniciar sesión en Santé</h5>
             </div>
-
+            
             {/* START: Gradient Border Frame */}
             <div style={styles.gradientFrame}>
               <form onSubmit={handleLogin} style={styles.loginForm}>
+                
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>Email</label>
+                  <label style={styles.label}>Correo electrónico</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Digitar el email"
+                    placeholder="Digitar el correo electrónico"
                     style={styles.input}
                     required
                   />
@@ -191,7 +193,8 @@ const LoginPage = () => {
                 left: '12px',
                 top: '-200px'
               }}>
-                <img src={illustrationLeft} alt="Teacher" style={styles.iconBigStyle} />
+                <img src={illustrationLeft} alt="LogoPildora" style={styles.iconBigStyle} />
+                <h5 style={styles.titleLogo}>¡Tu asistente virtual para la gestión en salud!</h5>
               </div>
 
             </div>
@@ -213,10 +216,10 @@ const styles = {
   // ... (previous styles remain the same)
 
 
-  leftSide: { flex: '1', minWidth: '25%', background: '#055882', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px' },
+  leftSide: { flex: '1', minWidth: '25%', background: 'linear-gradient(135deg, #0A4D68 0%,  #ffffff 50%, #0A4D68 110%, #ffffff 50% )', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px' },
   rightSide: { flex: '0 0 65%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', overflowY: 'auto' },
   loginCard: { width: '100%', maxWidth: '420px', padding: '0 20px' },
-  loginHeader: { textAlign: 'center', marginBottom: '32px' },
+  loginHeader: { textAlign: 'center', marginBottom: '32px', color:'#0A4D68'},
   // NEW: Gradient Frame Style
   gradientFrame: {
     padding: '3px',
@@ -316,17 +319,23 @@ const styles = {
 
   iconBigContainer: {
     position: 'relative', // This is the "anchor" for the icons
-    width: '300px',      // Adjust based on your design
-    height: '200px',     // Give it enough height to show both
+    width: '1000px',      // Adjust based on your design
+    height: '400px',     // Give it enough height to show both
     margin: '0 auto',    // Centers the container itself
+  },
+
+  titleLogo: {
+    position: 'relative', // This is the "anchor" for the icons
+    color: '#0A4D68',
+    marginLeft:'42px'      // Adjust based on your design   // Centers the container itself
   },
   floatingBigIcon: {
     position: 'absolute', // Allows them to overlap or move freely
     transition: 'all 0.3s ease',
   },
   iconBigStyle: {
-    marginTop: '100px',
-    width: '250px',       // Ensure they have a consistent size
+    marginTop: '150px',
+    width: '550px',       // Ensure they have a consistent size
     height: 'auto',
   }
 };
