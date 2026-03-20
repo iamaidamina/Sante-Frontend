@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import socket from "../socket";
-import bloqueador from "../assets/bloqueador-loreal.jpg";
+import bloqueador from "../assets/bloqueador-loreal.jpeg";
 import "../styles/notificationManager.css";
 
 export default function NotificationManager() {
