@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'; // 1. Added useState
 import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
 import Footer from './components/general-components/Footer';
-import illustrationRight from './assets/illustrationRight.svg'
+import illustrationRight from './assets/LogoAgenteVirtual.png'
 import TermsModal from "./components/TermsModal";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -114,7 +114,8 @@ const data = {
                 left: '12px',
                 top: '-200px'
               }}>
-                <img src={illustrationRight} alt="Teacher" style={styles.iconBigStyle} />
+                <img src={illustrationRight} alt="LogoPildora" style={styles.iconBigStyle} />
+                <h5 style={styles.titleLogo}>¡Tu asistente virtual para la gestión en salud!</h5>
               </div>
 
             </div>
@@ -127,6 +128,7 @@ const data = {
         <div style={styles.rightSide} className="rightSide">
           <div style={styles.loginCard}>
             <div style={styles.loginHeader}>
+              <h5>Registrarse en Santé</h5>
             </div>
 
             {/* START: Gradient Border Frame */}
@@ -255,7 +257,7 @@ const data = {
                 )}
 
                 <div style={styles.buttonWrapper}>
-                  <button disabled={isLoading || !recaptchaValue} type="submit">
+                  <button disabled={isLoading || !recaptchaValue} type="submit" style={styles.registroButton}>
                     {isLoading ? 'Registrando...' : 'Registrarse'}
                   </button>
                 </div>
@@ -289,10 +291,10 @@ const styles = {
   // ... (previous styles remain the same)
 
 
-  leftSide: { flex: '1', minWidth: '25%', background: '#055882', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px' },
+  leftSide: { flex: '1', minWidth: '25%', background: 'linear-gradient(135deg, #0A4D68 0%,  #ffffff 50%, #0A4D68 110%, #ffffff 50% )', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px' },
   rightSide: { flex: '0 0 65%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', overflowY: 'auto' },
   loginCard: { width: '100%', maxWidth: '420px', padding: '0 20px' },
-  loginHeader: { textAlign: 'center', marginBottom: '32px' },
+  loginHeader: { textAlign: 'center', marginBottom: '32px' , color:'#0A4D68'},
   // NEW: Gradient Frame Style
   gradientFrame: {
     padding: '3px',
@@ -385,17 +387,22 @@ const styles = {
 
   iconBigContainer: {
     position: 'relative', // This is the "anchor" for the icons
-    width: '300px',      // Adjust based on your design
-    height: '200px',     // Give it enough height to show both
+    width: '1000px',      // Adjust based on your design
+    height: '400px',     // Give it enough height to show both
     margin: '0 auto',    // Centers the container itself
+  },
+  titleLogo: {
+    position: 'relative', // This is the "anchor" for the icons
+    color: '#0A4D68',
+    marginLeft:'38px'      // Adjust based on your design   // Centers the container itself
   },
   floatingBigIcon: {
     position: 'absolute', // Allows them to overlap or move freely
     transition: 'all 0.3s ease',
   },
   iconBigStyle: {
-    marginTop: '100px',
-    width: '250px',       // Ensure they have a consistent size
+      marginTop: '200px',
+    width: '550px',       // Ensure they have a consistent size
     height: 'auto',
   },
   // Contenedor de la fila para poner 2 inputs
@@ -445,6 +452,25 @@ const styles = {
     fontSize: '12px',
     color: '#64748b',
     textAlign: 'center',
+  },
+  registroButton: {
+    background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
+    color: 'white',
+    border: 'none',
+    padding: '12px 24px', // Reduced padding from 16px/32px
+    borderRadius: '10px',
+    fontSize: '15px', // Slightly smaller font
+    fontWeight: '700',
+    fontFamily: "'Syne', sans-serif",
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 12px rgba(10, 77, 104, 0.2)',
+    width: 'auto', // Button no longer takes full width
+    minWidth: '160px', // Ensures it doesn't get TOO small
   },
 };
 
