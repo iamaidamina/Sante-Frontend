@@ -16,7 +16,7 @@ const Sidebar = () => {
 
   return (
     <div className='sidebar'  style={{ display: 'flex', height: '100%', overflow: 'scroll initial' }}>
-      <CDBSidebar data-toggle="collapse" textColor="#fff" backgroundColor="#055882">
+      <CDBSidebar data-toggle="collapse" textColor="#fff" backgroundColor="#0A4D68">
         <CDBSidebarHeader onClick={()=>setEstado(estado ? false : true)} prefix={<i className="fa fa-bars fa-large"></i>}>
           <a href="/medicamentos" className="text-decoration-none" style={{ color: 'inherit' }}>
             SANTÉ
