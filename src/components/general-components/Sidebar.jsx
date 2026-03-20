@@ -35,13 +35,13 @@ const Sidebar = () => {
               <CDBSidebarMenuItem icon="user-nurse">Citas</CDBSidebarMenuItem>
             </Link>
             <Link to="/examenes">
-              <CDBSidebarMenuItem icon="stethoscope">Examenes</CDBSidebarMenuItem>
+              <CDBSidebarMenuItem icon="stethoscope">Exámenes</CDBSidebarMenuItem>
             </Link>
             <Link to="/entregas">
               <CDBSidebarMenuItem icon="car">Entregas</CDBSidebarMenuItem>
             </Link>
             <Link to="/guia-usuario">
-              <CDBSidebarMenuItem icon="book">Guia de usuario</CDBSidebarMenuItem>
+              <CDBSidebarMenuItem icon="book">Guía de usuario</CDBSidebarMenuItem>
             </Link>
           </CDBSidebarMenu>
         </CDBSidebarContent>
