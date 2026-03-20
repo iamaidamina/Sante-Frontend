@@ -182,15 +182,20 @@ const CitasPage = () => {
     }
   };
 
+
   const getSpecialtyName = (id) => {
-    const specialties = {
-      1: 'Medicina General',
-      2: 'Odontología',
-      3: 'Cardiología',
-      4: 'Geriatría'
-    };
-    return specialties[id] || id || 'N/A';
-  };
+    if (!id || !especialidades.length) return 'N/A';
+    
+    const specialty = especialidades.find(esp => 
+        esp.id === Number(id) || 
+        esp.id_especialidad === Number(id)
+    );
+    
+    return specialty?.nombre || 
+           specialty?.name || 
+           specialty?.especialidad || 
+           'N/A';
+};
 
   // ✅ Now safe to return early
   if (isLoading) {
