@@ -128,7 +128,7 @@ const data = {
         <div style={styles.rightSide} className="rightSide">
           <div style={styles.loginCard}>
             <div style={styles.loginHeader}>
-              <h5>Registrarse en Santé</h5>
+             {/* <h5>Registrarse en Santé</h5>*/}
             </div>
 
             {/* START: Gradient Border Frame */}
