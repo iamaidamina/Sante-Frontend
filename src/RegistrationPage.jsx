@@ -128,7 +128,7 @@ const data = {
         <div style={styles.rightSide} className="rightSide">
           <div style={styles.loginCard}>
             <div style={styles.loginHeader}>
-             {/* <h5>Registrarse en Santé</h5>*/}
+              <h5>Registrarse en Santé</h5>
             </div>
 
             {/* START: Gradient Border Frame */}
@@ -171,7 +171,7 @@ const data = {
                     />
                   </div>
                   <div style={styles.inputGroupHalf}>
-                    <label style={styles.label}>Email</label>
+                    <label style={styles.label}>Correo electrónico</label>
                     <input
                       type="email"
                       value={email}
@@ -292,9 +292,9 @@ const styles = {
 
 
   leftSide: { flex: '1', minWidth: '25%', background: 'linear-gradient(135deg, #0A4D68 0%,  #ffffff 50%, #0A4D68 110%, #ffffff 50% )', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px' },
-  rightSide: { flex: '0 0 65%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', overflowY: 'auto' },
+  rightSide: { flex: '0 0 65%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', overflowY: 'auto', marginBottom:'16px'},
   loginCard: { width: '100%', maxWidth: '420px', padding: '0 20px' },
-  loginHeader: { textAlign: 'center', marginBottom: '32px' , color:'#0A4D68'},
+  loginHeader: { textAlign: 'center', marginBottom: '10px' , color:'#0A4D68'},
   // NEW: Gradient Frame Style
   gradientFrame: {
     padding: '3px',
@@ -305,9 +305,9 @@ const styles = {
   loginForm: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px', // Reduced gap for a tighter feel
+    gap: '5px', // Reduced gap for a tighter feel
     background: '#ffffff',
-    padding: '30px 24px',
+    padding: '5px 24px',
     borderRadius: '17px',
   },
   // NEW: Forgot Password Styles
