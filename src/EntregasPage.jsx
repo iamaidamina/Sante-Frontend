@@ -278,8 +278,8 @@ const EntregasPage = ({ studentsData }) => {
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
                             <div style={styles.avatar}>{delivery.nombre_producto.charAt(0)}</div>
-                              <span>{delivery.nombre_producto}</span>
-                            
+                            <span>{delivery.nombre_producto}</span>
+
                           </div>
                         </td>
                         <td style={styles.tableCell}>
@@ -296,7 +296,7 @@ const EntregasPage = ({ studentsData }) => {
                           <div style={styles.studentName}>
                             <span>
                               {delivery.fecha_llegada
-                                ? new Date(delivery.fecha_llegada).toISOString().slice(0, 10) 
+                                ? new Date(delivery.fecha_llegada).toISOString().slice(0, 10)
                                 : 'N/A'
                               }
                             </span>
@@ -469,6 +469,77 @@ const EntregasPage = ({ studentsData }) => {
                     }} />
                 </div>
               </div>
+              {/* Agregar después de "Comentario" - Nueva Fila 4 */}
+              <div style={styles.formRow}>
+                {/* Pregunta: Es medicamento? */}
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>¿Es medicamento?</label>
+                  <select
+                    style={styles.modalInput}
+                    value={isEditMode ? editingDelivery.es_medicamento || 'no' : newDelivery.es_medicamento || 'no'}
+                    onChange={(e) => {
+                      const esMedicamento = e.target.value;
+
+                      if (isEditMode) {
+                        setEditingDelivery({
+                          ...editingDelivery,
+                          es_medicamento: esMedicamento,
+                          orden_medica: esMedicamento === 'si' ? editingDelivery.orden_medica || '' : null  // Reset si no es medicamento
+                        });
+                      } else {
+                        setNewDelivery({
+                          ...newDelivery,
+                          es_medicamento: esMedicamento,
+                          orden_medica: esMedicamento === 'si' ? newDelivery.orden_medica || '' : null
+                        });
+                      }
+                    }}
+                  >
+                    <option value="no">No</option>
+                    <option value="si">Sí</option>
+                  </select>
+                </div>
+
+                {/* Campo condicional: Orden médica (solo si es medicamento) */}
+                <div
+                  style={{
+                    ...styles.inputGroup,
+                    opacity: (isEditMode ? editingDelivery.es_medicamento === 'si' : newDelivery.es_medicamento === 'si') ? 1 : 0.5,
+                    pointerEvents: (isEditMode ? editingDelivery.es_medicamento === 'si' : newDelivery.es_medicamento === 'si') ? 'auto' : 'none'
+                  }}>
+                  <label style={styles.fieldLabel}>Orden médica</label>
+                   <div style={styles.fileButtonContainer}>
+                    <input
+                      type="file"
+                      id="fileLateral"
+                      accept="image/*,application/pdf"
+                      style={{
+                        // Estilos para input visible y bonito
+                        width: '100%',
+                        height: '40px',
+                        padding: '8px 12px',
+                        border: '2px dashed #ccc',
+                        borderRadius: '8px',
+                        backgroundColor: '#f9f9f9',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          console.log('Archivo:', file.name, file.size);
+                          // Procesa tu archivo aquí
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.target.value = ''; // Limpia para permitir re-selección del mismo archivo
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
 
               <button type="submit" style={styles.submitButton}>{isEditMode ? 'Actualizar Solicitud Entrega' : 'Registrar Solicitud Entrega'}</button>
             </form>
