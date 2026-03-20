@@ -9,6 +9,7 @@ import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import Select from 'react-select';
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { fetchWithAuth } from './utils/fetchWithAuth';
 import "leaflet/dist/leaflet.css";
 
 function DraggableMap({ onLocationSelected }) {
@@ -24,59 +25,205 @@ function DraggableMap({ onLocationSelected }) {
     return <Marker position={position} />;
   }
 
-  return (
-    <MapContainer
-      center={position}
-      zoom={14}
-      style={{ height: "300px", width: "300px" }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-      />
-      <DraggableMarker />
-    </MapContainer>
-  );
 }
 
 
 const EntregasPage = ({ studentsData }) => {
-  // 4. Create internal state
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
+  const [deliveries, setDeliveries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selected, setSelected] = useState({ value: 'thiago martínez', label: 'Thiago Martínez' });
+  const [newDelivery, setNewDelivery] = useState({
+    lugar_compra: '',
+    id_domiciliario: null,
+    nombre_producto: '',
+    comentario: '',
+    lugar_entrega: '',
+    fecha_llegada: '',
+  });
+
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingDelivery, setEditingDelivery] = useState(null);
+  const [domiciliarios, setDomiciliarios] = useState([]);
   const navigate = useNavigate();
 
-  const [address, setAddress] = useState('');     // for "Lugar de entrega"
-  const [latLng, setLatLng] = useState(null);     // { lat, lng }
-
-  // ✅ Add refs here
-  const inputRef = useRef(null);    // for the autocomplete input
-  const mapRef = useRef(null);
-
-  React.useEffect(() => {
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    //document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
+  //Carga Entregas
+  useEffect(() => {
+    fetchDeliveries();
   }, []);
 
-  // 5. Create internal handleLogin
-  const handleLogin = (e) => {
-    e.preventDefault(); // This stops the "?" refresh
+  //Carga Domiciliarios
+  useEffect(() => {
+    fetchDomiciliarios();
+  }, []);
 
-    if (email === 'teacher@school.com' && password === 'demo123') {
-      setLoginError('');
-      navigate('/reportes'); // 6. Use navigate instead of setIsLoggedIn
-    } else {
-      setLoginError('Invalid credentials. Try teacher@school.com / demo123');
+  const fetchDomiciliarios = async () => {
+    try {
+      const response = await fetchWithAuth('/api/catalog/domiciliarios');
+      if (!response.ok) {
+        throw new Error('Error al cargar domiciliarios');
+      }
+      const data = await response.json();
+      setDomiciliarios(data);
+    } catch (err) {
+      console.error(err);
+    }
+
+  }
+
+  const fetchDeliveries = async () => {
+    try {
+      setIsLoading(true);
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        setError('No token found. Please login again.');
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetchWithAuth('/api/deliveries');
+
+      if (!response.ok) {
+        throw new Error('Error al cargar entregas');
+      }
+
+      const data = await response.json();
+      setDeliveries(data);
+    } catch (error) {
+      setError('No se pudieron cargar las entregas');
+      console.error('Fetch error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('🛠️ Creating:', newDelivery);
+    try {
+      const response = await fetchWithAuth('/api/deliveries', {
+        method: 'POST',
+        body: JSON.stringify(newDelivery)
+      });
+
+      if (response.ok) {
+        setNewDelivery({
+          lugar_compra: '',
+          id_domiciliario: null,
+          nombre_producto: '',
+          comentario: '',
+          lugar_entrega: '',
+          fecha_llegada: '',
+        });
+        setIsModalOpen(false);
+        fetchDeliveries(); // Refresh list
+      } else {
+        alert('Error al crear entrega');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('¿Eliminar esta entrega?')) return;
+
+    try {
+      await fetchWithAuth(`/api/deliveries/${id}`, {
+        method: 'DELETE'
+      });
+
+      fetchAppointments(); // Refresh list
+    } catch (error) {
+      alert('Error al eliminar');
+    }
+  };
+
+  const handleEdit = (id, delivery) => {
+    /*
+    setEditingMedication({ ...medication, id_medicamento: id });
+    setIsEditMode(true);
+    setIsModalOpen(true);  // ← THIS OPENS MODAL
+    */
+    const cleanDelivery = {
+      id_entrega: id,
+      lugar_compra: delivery.lugar_compra || '',
+      id_domiciliario: delivery.id_domiciliario ? parseInt(delivery.id_domiciliario, 10) : 1,
+      nombre_producto: delivery.nombre_producto || '',
+      comentario: delivery.comentario || '',
+      lugar_entrega: delivery.lugar_entrega || '',
+      fecha_llegada: delivery.fecha_llegada
+        ? new Date(delivery.fecha_llegada).toISOString().slice(0, 16)
+        : '2026-03-14T14:32:44.964Z'
+    };
+
+    setEditingDelivery(cleanDelivery);
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!editingDelivery) {
+      alert('No delivery selected for editing');
+      return;
+    }
+
+    try {
+      const response = await fetchWithAuth(
+        `/api/deliveries/${editingDelivery.id_entrega}`,
+        {
+          method: 'PUT',
+          body: JSON.stringify(editingDelivery)
+        }
+      );
+
+      if (response.ok) {
+        setIsEditMode(false);
+        setEditingDelivery(null);
+        setIsModalOpen(false);
+        fetchDeliveries(); // Refresh list
+      } else {
+        alert('Error al actualizar');
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    }
+  };
+
+  const getDomiciliarioName = (id) => {
+    if (!id || !domiciliarios.length) return 'N/A';
+
+    const domiciliario = domiciliarios.find(esp =>
+      esp.id === Number(id) ||
+      esp.id_entrega === Number(id)
+    );
+
+    return domiciliario?.nombre_domiciliario ||
+      'N/A';
+  };
+
+  // ✅ Now safe to return early
+  if (isLoading) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+          Cargando entregas...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>
+          {error}
+        </div>
+      </div>
+    );
+  }
   return (
     <div style={styles.pageWrapper} className="pageWrapper">
 
@@ -120,56 +267,62 @@ const EntregasPage = ({ studentsData }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {studentsData.map((student, index) => (
-                      <tr
-                        key={student.id}
-                        style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
-                      >
+                    {deliveries.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                          No hay entregas registradas
+                        </td>
+                      </tr>
+                    ) : (deliveries.map((delivery, index) => (
+                      <tr key={delivery.id_entrega} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{student.compra}</span>
+                            <span>{delivery.lugar_compra}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
-                          <span style={student.estado === 'Entregado' ? styles.badgeMale : styles.badgeFemale}>
-                            {student.estado}
-                          </span>
+                        
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{student.domiciliario}</span>
-                          </div>
-                        </td>
-                        <td style={styles.tableCell}>
-                          <div style={styles.studentName}>
-                            <span>{student.fecha}</span>
+                            <span>{getDomiciliarioName(delivery.id_entrega)}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{student.medicamento}</span>
+                             <span>
+                                {delivery.fecha_llegada
+                                  ? new Date(delivery.fecha_llegada).toLocaleString('es-CO', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    timeZone: 'America/Bogota'  // Your timezone
+                                  })
+                                  : 'N/A'
+                                }
+                              </span>
+                          </div>
+                        </td>
+                        <td style={styles.tableCell}>
+                          <div style={styles.studentName}>
+                            <span>{delivery.nombre_producto}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.actionGroup}>
-                            <span
-                              title="Editar"
-                              style={styles.editEmoji}
-                              onClick={() => console.log('Edit', student.id)}
-                            >
+                            <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(delivery.id_entrega, delivery)}>
                               <FontAwesomeIcon icon={faEdit} />
                             </span>
-                            <span
-                              title="Eliminar"
-                              style={styles.deleteEmoji}
-                              onClick={() => console.log('Delete', student.id)}
-                            >
+                            <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(delivery.id_entrega)}>
                               <FontAwesomeIcon icon={faTrash} />
                             </span>
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -206,14 +359,9 @@ const EntregasPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Fecha y hora</label>
+                  <label style={styles.fieldLabel}>Fecha llegada</label>
                   <input style={styles.modalInput} type="datetime-local" />
-                  <DraggableMap
-                    onLocationSelected={(lat, lng) => {
-                      setLatLng({ lat, lng });
-                      setAddress(`(${lat.toFixed(6)}, ${lng.toFixed(6)})`);
-                    }}
-                  />
+
                 </div>
 
                 {/* Input 2: Traditional Button Style */}
@@ -236,8 +384,21 @@ const EntregasPage = ({ studentsData }) => {
 
               {/* Fila 3: Datepicker e Input Normal */}
               <div style={styles.formRow}>
+                {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Lugar de entrega</label>
+                  <label style={styles.fieldLabel}>Lugar llegada</label>
+                  <input
+                    ref={inputRef}
+                    style={styles.modalInput}
+                    type="text"
+                    placeholder="lugar"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Comentario</label>
                   <input
                     ref={inputRef}
                     style={styles.modalInput}
