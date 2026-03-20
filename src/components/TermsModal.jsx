@@ -60,7 +60,9 @@ const TermsModal = ({ onAccept, onClose, readOnly = false }) => {
 
           <p>7. El uso indebido puede resultar en suspensión.</p>
 
-          <p>8. Estos términos pueden actualizarse sin previo aviso.</p>
+            <p>8. Los datos que registre pueden ser utilizados de forma anónima para entrenar modelos de inteligencia artificial y mejorar el sistema.</p>
+
+            <p>9. Estos términos pueden actualizarse sin previo aviso.</p>
 
         </div>
 
