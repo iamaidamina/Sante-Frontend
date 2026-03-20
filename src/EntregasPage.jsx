@@ -113,7 +113,7 @@ const EntregasPage = ({ studentsData }) => {
           nombre_producto: '',
           comentario: '',
           lugar_entrega: '',
-          fecha_llegada: '',
+          fecha_llegada: null,
         });
         setIsModalOpen(false);
         fetchDeliveries(); // Refresh list
@@ -133,7 +133,7 @@ const EntregasPage = ({ studentsData }) => {
         method: 'DELETE'
       });
 
-      fetchAppointments(); // Refresh list
+      fetchDeliveries(); // Refresh list
     } catch (error) {
       alert('Error al eliminar');
     }
@@ -153,8 +153,8 @@ const EntregasPage = ({ studentsData }) => {
       comentario: delivery.comentario || '',
       lugar_entrega: delivery.lugar_entrega || '',
       fecha_llegada: delivery.fecha_llegada
-        ? new Date(delivery.fecha_llegada).toISOString().slice(0, 16)
-        : '2026-03-14T14:32:44.964Z'
+        ? new Date(delivery.fecha_llegada).toISOString().slice(0, 10)  // ✅ "2026-03-14"
+        : ''
     };
 
     setEditingDelivery(cleanDelivery);
@@ -197,7 +197,7 @@ const EntregasPage = ({ studentsData }) => {
 
     const domiciliario = domiciliarios.find(esp =>
       esp.id === Number(id) ||
-      esp.id_entrega === Number(id)
+      esp.id_domiciliario === Number(id)
     );
 
     return domiciliario?.nombre_domiciliario ||
@@ -258,11 +258,11 @@ const EntregasPage = ({ studentsData }) => {
                 <table style={styles.table}>
                   <thead style={styles.stickyHeader}>
                     <tr style={styles.tableHeaderRow}>
+                      <th style={styles.tableHeader}>Nombre producto</th>
                       <th style={styles.tableHeader}>Lugar de Compra</th>
-                      <th style={styles.tableHeader}>Estado</th>
                       <th style={styles.tableHeader}>Nombre domiciliario</th>
                       <th style={styles.tableHeader}>Fecha llegada</th>
-                      <th style={styles.tableHeader}>Nombre producto</th>
+                      <th style={styles.tableHeader}>Estado</th>
                       <th style={styles.tableHeader}>Acciones</th>
                     </tr>
                   </thead>
@@ -277,37 +277,36 @@ const EntregasPage = ({ studentsData }) => {
                       <tr key={delivery.id_entrega} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
+                            <div style={styles.avatar}>{delivery.nombre_producto.charAt(0)}</div>
+                              <span>{delivery.nombre_producto}</span>
+                            
+                          </div>
+                        </td>
+                        <td style={styles.tableCell}>
+                          <div style={styles.studentName}>
                             <span>{delivery.lugar_compra}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
-                        
-                        </td>
-                        <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{getDomiciliarioName(delivery.id_entrega)}</span>
+                            <span>{getDomiciliarioName(delivery.id_domiciliario)}</span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                             <span>
-                                {delivery.fecha_llegada
-                                  ? new Date(delivery.fecha_llegada).toLocaleString('es-CO', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    timeZone: 'America/Bogota'  // Your timezone
-                                  })
-                                  : 'N/A'
-                                }
-                              </span>
+                            <span>
+                              {delivery.fecha_llegada
+                                ? new Date(delivery.fecha_llegada).toISOString().slice(0, 10) 
+                                : 'N/A'
+                              }
+                            </span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.studentName}>
-                            <span>{delivery.nombre_producto}</span>
+                            <span style={delivery.estado === 'pendiente' ? styles.badgeFemale : styles.badgeMale}>
+                              {delivery.estado}
+                            </span>
                           </div>
                         </td>
                         <td style={styles.tableCell}>
@@ -337,21 +336,49 @@ const EntregasPage = ({ studentsData }) => {
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
-              <h3>Solicitar Nueva Entrega</h3>
-              <button onClick={() => setIsModalOpen(false)} style={styles.closeButton}>✕</button>
+              <h3>{isEditMode ? 'Editar Entrega' : 'Solicitar Nueva Entrega'}</h3>
+              <button
+                onClick={() => {
+                  fetchDomiciliarios();
+                  setIsModalOpen(false);
+                  setIsEditMode(false);
+                  setEditingDelivery(null);
+                }}
+                style={styles.closeButton}>✕
+              </button>
             </div>
 
-            <form style={styles.modalForm} onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+            <form style={styles.modalForm} onSubmit={isEditMode ? handleUpdate : handleSubmit}>
 
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre producto</label>
-                  <input style={styles.modalInput} type="text" placeholder="producto" />
+                  <input style={styles.modalInput}
+                    type="text"
+                    placeholder="producto"
+                    value={isEditMode ? editingDelivery.nombre_producto : newDelivery.nombre_producto}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingDelivery({ ...editingDelivery, nombre_producto: e.target.value });
+                      } else {
+                        setNewDelivery({ ...newDelivery, nombre_producto: e.target.value });
+                      }
+                    }} />
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Lugar de compra</label>
-                  <input style={styles.modalInput} type="text" placeholder="lugar" />
+                  <input style={styles.modalInput}
+                    type="text"
+                    placeholder="lugar"
+                    value={isEditMode ? editingDelivery.lugar_compra : newDelivery.lugar_compra}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingDelivery({ ...editingDelivery, lugar_compra: e.target.value });
+                      } else {
+                        setNewDelivery({ ...newDelivery, lugar_compra: e.target.value });
+                      }
+                    }} />
                 </div>
               </div>
 
@@ -360,25 +387,52 @@ const EntregasPage = ({ studentsData }) => {
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Fecha llegada</label>
-                  <input style={styles.modalInput} type="datetime-local" />
+                  <input
+                    style={styles.modalInput}
+                    type="date"
+                    value={
+                      // Formato YYYY-MM-DD o vacío
+                      (isEditMode ? editingDelivery.fecha_llegada : newDelivery.fecha_llegada) || ''
+                    }
+                    onChange={(e) => {
 
+                      console.log("Fecha: " + e.target.value);
+                      if (isEditMode) {
+                        setEditingDelivery({ ...editingDelivery, fecha_llegada: e.target.value });
+                      } else {
+                        setNewDelivery({ ...newDelivery, fecha_llegada: e.target.value });
+                      }
+                    }}
+                  />
                 </div>
+
 
                 {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre domiciliario</label>
-                  <Select
-                    options={[
-                      { value: 'valentina rojas', label: 'Valentina Rojas' },
-                      { value: 'thiago martínez', label: 'Thiago Martínez' },
-                      { value: 'damián vega', label: 'Damián Vega' },
-                      { value: 'zoe morales', label: 'Zoe Morales' },
-                      { value: 'abril mendoza', label: 'Abril Mendoza' },
-                      { value: 'julieta paredes', label: 'Julieta Paredes' },
-                    ]}
-                    value={selected}
-                    onChange={(option) => setSelected(option)}  // Store full object
-                  />
+                  <select
+                    style={styles.modalInput}
+                    value={isEditMode ? editingDelivery?.id_domiciliario || '' : newDelivery.id_domiciliario || ''}
+                    onChange={(e) => {
+                      const numberValue = parseInt(e.target.value) || null;
+                      if (isEditMode) {
+                        setEditingDelivery({ ...editingDelivery, id_domiciliario: numberValue });
+                      } else {
+                        setNewDelivery({ ...newDelivery, id_domiciliario: numberValue });
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar domiciliario</option>
+
+                    {domiciliarios.map((esp) => (
+                      <option
+                        key={esp.id_domiciliario}
+                        value={esp.id_domiciliario}
+                      >
+                        {esp.nombre_domiciliario}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -386,31 +440,37 @@ const EntregasPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Lugar llegada</label>
-                  <input
-                    ref={inputRef}
-                    style={styles.modalInput}
+                  <label style={styles.fieldLabel}>Lugar entrega</label>
+                  <input style={styles.modalInput}
                     type="text"
                     placeholder="lugar"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
+                    value={isEditMode ? editingDelivery.lugar_entrega : newDelivery.lugar_entrega}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingDelivery({ ...editingDelivery, lugar_entrega: e.target.value });
+                      } else {
+                        setNewDelivery({ ...newDelivery, lugar_entrega: e.target.value });
+                      }
+                    }} />
 
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Comentario</label>
-                  <input
-                    ref={inputRef}
-                    style={styles.modalInput}
+                  <input style={styles.modalInput}
                     type="text"
-                    placeholder="lugar"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
+                    placeholder="comentario"
+                    value={isEditMode ? editingDelivery.comentario : newDelivery.comentario}
+                    onChange={(e) => {
+                      if (isEditMode) {
+                        setEditingDelivery({ ...editingDelivery, comentario: e.target.value });
+                      } else {
+                        setNewDelivery({ ...newDelivery, comentario: e.target.value });
+                      }
+                    }} />
                 </div>
               </div>
 
-              <button type="submit" style={styles.submitButton}>Registrar Solicitud Entrega</button>
+              <button type="submit" style={styles.submitButton}>{isEditMode ? 'Actualizar Solicitud Entrega' : 'Registrar Solicitud Entrega'}</button>
             </form>
           </div>
         </div>
