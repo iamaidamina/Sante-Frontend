@@ -22,7 +22,7 @@ export default function Footer () {
                       <div className="email" style={{ marginTop: "60px" }}>
                               <div className="icono-footer contacto">
                                   <FontAwesomeIcon icon={faEnvelope}/>
-                                  &nbsp; sante@email.com
+                                  &nbsp; admin@sante.com
                               </div>
                       </div>
               </div>
@@ -43,7 +43,7 @@ export default function Footer () {
                               <FontAwesomeIcon icon={faYoutube}/>
                           </div>
                       </a>
-                      <p>SISE© 2026. Todos los derechos reservados</p>
+                      <p>SANTÉ© 2026. Todos los derechos reservados</p>
               </div>
           </div>
       </div>
