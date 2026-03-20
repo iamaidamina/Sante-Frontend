@@ -394,14 +394,15 @@ const styles = {
   titleLogo: {
     position: 'relative', // This is the "anchor" for the icons
     color: '#0A4D68',
-    marginLeft:'38px'      // Adjust based on your design   // Centers the container itself
+    marginLeft:'38px',
+    marginTop:'-10px'      // Adjust based on your design   // Centers the container itself
   },
   floatingBigIcon: {
     position: 'absolute', // Allows them to overlap or move freely
     transition: 'all 0.3s ease',
   },
   iconBigStyle: {
-      marginTop: '200px',
+      marginTop: '160px',
     width: '550px',       // Ensure they have a consistent size
     height: 'auto',
   },
