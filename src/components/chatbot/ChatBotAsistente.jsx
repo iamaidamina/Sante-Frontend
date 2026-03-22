@@ -34,10 +34,110 @@ const PREGUNTAS_FRECUENTES = [
   },
 ];
 
+const DIAGNOSTICOS = [
+  {
+    nombre: 'Diabetes',
+    info: 'La diabetes es una enfermedad cronica donde el cuerpo no produce o no usa correctamente la insulina. Es importante controlar los niveles de azucar en sangre, seguir una dieta balanceada, hacer ejercicio regular y tomar los medicamentos segun lo indicado por tu medico.',
+    consejos: [
+      'Mide tu glucosa regularmente y lleva un registro.',
+      'Evita el consumo excesivo de azucar y harinas refinadas.',
+      'Camina al menos 30 minutos al dia.',
+      'No te saltes comidas y come en horarios regulares.',
+      'Asiste a tus controles medicos cada 3 meses.',
+    ],
+    organizaciones: [
+      { nombre: 'Asociacion Colombiana de Diabetes', telefono: '(601) 345-5560', web: 'https://asodiabetes.org' },
+      { nombre: 'Federacion Diabetologica Colombiana', telefono: '(601) 232-8425', web: 'https://fedediabetes.org' },
+      { nombre: 'Fundacion Diabetes Cali', telefono: '(602) 668-1234', web: '' },
+    ],
+  },
+  {
+    nombre: 'Hipertension arterial',
+    info: 'La hipertension es cuando la presion de la sangre en las arterias es constantemente alta. Esto puede danar el corazon, los rinones y otros organos si no se controla. Con medicamentos, dieta baja en sal y ejercicio, se puede manejar efectivamente.',
+    consejos: [
+      'Reduce el consumo de sal en tus comidas.',
+      'Toma tu medicamento a la misma hora todos los dias.',
+      'Controla tu presion arterial en casa y lleva un registro.',
+      'Evita el estres excesivo, practica tecnicas de relajacion.',
+      'Limita el consumo de alcohol y deja de fumar.',
+    ],
+    organizaciones: [
+      { nombre: 'Sociedad Colombiana de Cardiologia', telefono: '(601) 523-1640', web: 'https://scc.org.co' },
+      { nombre: 'Liga Colombiana contra el Infarto y la Hipertension', telefono: '(601) 657-2020', web: '' },
+      { nombre: 'Linea de salud Cali', telefono: '(602) 554-2424', web: '' },
+    ],
+  },
+  {
+    nombre: 'Enfermedad renal cronica',
+    info: 'La enfermedad renal cronica significa que los rinones estan danados y no pueden filtrar la sangre correctamente. Es importante seguir una dieta especial, controlar la presion arterial y la diabetes si las tienes, y asistir a tus controles nefrologicos.',
+    consejos: [
+      'Bebe suficiente agua pero no en exceso, segun indicacion medica.',
+      'Reduce el consumo de sodio, potasio y fosforo.',
+      'Controla tu presion arterial y glucosa.',
+      'Evita medicamentos antiinflamatorios sin receta (ibuprofeno, naproxeno).',
+      'Asiste a tus citas con nefrologia regularmente.',
+    ],
+    organizaciones: [
+      { nombre: 'Asociacion Colombiana de Nefrologia', telefono: '(601) 616-1077', web: 'https://asocolnef.com' },
+      { nombre: 'Fundacion Renal de Colombia', telefono: '(601) 744-7267', web: '' },
+      { nombre: 'Red de Dialisis del Valle', telefono: '(602) 330-4500', web: '' },
+    ],
+  },
+  {
+    nombre: 'EPOC (Enfermedad Pulmonar)',
+    info: 'La EPOC es una enfermedad pulmonar cronica que dificulta la respiracion. Incluye bronquitis cronica y enfisema. Dejar de fumar es lo mas importante. Los inhaladores y la rehabilitacion pulmonar ayudan a mejorar la calidad de vida.',
+    consejos: [
+      'Si fumas, busca ayuda para dejar de fumar.',
+      'Usa tus inhaladores segun las indicaciones medicas.',
+      'Evita la contaminacion del aire y el humo.',
+      'Haz ejercicios de respiracion diariamente.',
+      'Vacunate contra la gripe y neumonia cada ano.',
+    ],
+    organizaciones: [
+      { nombre: 'Asociacion Colombiana de Neumologia', telefono: '(601) 249-1717', web: 'https://asoneumocito.org' },
+      { nombre: 'Liga Antitabaquica Colombiana', telefono: '(601) 232-3456', web: '' },
+      { nombre: 'Hospital Universitario del Valle', telefono: '(602) 620-6000', web: '' },
+    ],
+  },
+  {
+    nombre: 'Artritis / Enfermedades reumaticas',
+    info: 'La artritis causa inflamacion y dolor en las articulaciones. Existen varios tipos como la artritis reumatoide y la osteoartritis. Con tratamiento adecuado, ejercicio suave y cuidado de las articulaciones, se puede mantener una buena calidad de vida.',
+    consejos: [
+      'Mantente activo con ejercicios de bajo impacto (natacion, caminata).',
+      'Aplica calor o frio en las articulaciones doloridas.',
+      'Toma tus medicamentos segun lo indicado.',
+      'Mantiene un peso saludable para reducir presion en las articulaciones.',
+      'Descansa cuando sientas fatiga, no te sobre-esfuerces.',
+    ],
+    organizaciones: [
+      { nombre: 'Asociacion Colombiana de Reumatologia', telefono: '(601) 635-4050', web: 'https://asoreuma.org' },
+      { nombre: 'Liga Colombiana contra el Reumatismo', telefono: '(601) 245-6789', web: '' },
+      { nombre: 'Fundacion Valle del Lili - Reumatologia', telefono: '(602) 331-9090', web: 'https://valledellili.org' },
+    ],
+  },
+  {
+    nombre: 'Otro diagnostico',
+    info: 'Si recibiste un diagnostico que no aparece en esta lista, te recomendamos hablar con tu medico para entender mejor tu condicion. Tambien puedes buscar informacion en fuentes confiables y contactar organizaciones de salud en tu ciudad.',
+    consejos: [
+      'Pregunta a tu medico todo lo que no entiendas sobre tu diagnostico.',
+      'Busca un grupo de apoyo de pacientes con tu misma condicion.',
+      'Lleva un diario de tus sintomas para compartir con tu medico.',
+      'No te automediques, siempre consulta con un profesional.',
+      'Usa SANTE para llevar el control de tus medicamentos y citas.',
+    ],
+    organizaciones: [
+      { nombre: 'Secretaria de Salud de Cali', telefono: '(602) 554-2424', web: 'https://cali.gov.co/salud' },
+      { nombre: 'Linea de salud nacional 106', telefono: '106', web: '' },
+      { nombre: 'Supersalud - Linea gratuita', telefono: '01 8000 513 700', web: 'https://supersalud.gov.co' },
+    ],
+  },
+];
+
 const MENU_PRINCIPAL = [
   { id: 'medicamento', label: 'Registrar un medicamento' },
   { id: 'cita', label: 'Agendar una cita medica' },
   { id: 'examen', label: 'Registrar un examen' },
+  { id: 'diagnostico', label: 'Acabo de recibir un diagnostico' },
   { id: 'preguntas', label: 'Tengo una pregunta' },
 ];
 
@@ -105,6 +205,10 @@ export default function ChatBotAsistente() {
       setPasoActual(0);
       setDatosRecolectados({});
       iniciarFlujoExamen();
+    } else if (opcionId === 'diagnostico') {
+      agregarMensajeUsuario('Acabo de recibir un diagnostico');
+      setFlujoActual('diagnostico');
+      agregarMensajeBot('Entiendo que recibir un diagnostico puede ser dificil. Estoy aqui para ayudarte. Selecciona tu diagnostico o el mas parecido:');
     } else if (opcionId === 'preguntas') {
       agregarMensajeUsuario('Tengo una pregunta');
       setFlujoActual('preguntas');
@@ -477,6 +581,46 @@ export default function ChatBotAsistente() {
               style={styles.botonOpcion}
             >
               {pf.pregunta}
+            </button>
+          ))}
+          <button onClick={() => seleccionarOpcion('menu')} style={styles.botonSecundario}>
+            Volver al menu
+          </button>
+        </div>
+      );
+    }
+
+    // Diagnosticos - seleccion
+    if (flujoActual === 'diagnostico') {
+      return (
+        <div style={styles.botonesContainer}>
+          {DIAGNOSTICOS.map((diag, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                agregarMensajeUsuario(diag.nombre);
+                agregarMensajeBot(diag.info);
+
+                const consejosTexto = diag.consejos.map((c, i) => `${i + 1}. ${c}`).join('\n');
+                setTimeout(() => {
+                  agregarMensajeBot(`Consejos para tu dia a dia:\n${consejosTexto}`);
+                }, 800);
+
+                const orgsTexto = diag.organizaciones
+                  .map((o) => `${o.nombre}\nTel: ${o.telefono}${o.web ? `\nWeb: ${o.web}` : ''}`)
+                  .join('\n\n');
+                setTimeout(() => {
+                  agregarMensajeBot(`Organizaciones que pueden ayudarte:\n\n${orgsTexto}`);
+                }, 1600);
+
+                setTimeout(() => {
+                  agregarMensajeBot('Recuerda: no estas solo en esto. SANTE te ayuda a llevar el control de tus medicamentos y citas. Si necesitas algo mas, estoy aqui.');
+                  setFlujoActual('finalizado');
+                }, 2400);
+              }}
+              style={styles.botonOpcion}
+            >
+              {diag.nombre}
             </button>
           ))}
           <button onClick={() => seleccionarOpcion('menu')} style={styles.botonSecundario}>
