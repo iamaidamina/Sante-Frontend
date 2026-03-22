@@ -209,13 +209,14 @@ const ExamenesPage = ({ studentsData }) => {
             <div style={styles.tableCard}>
               <div style={styles.scrollWrapper}>
                 <table style={styles.table}>
+                  <caption className="sr-only">Listado de examenes</caption>
                   <thead style={styles.stickyHeader}>
                     <tr style={styles.tableHeaderRow}>
-                      <th style={styles.tableHeader}>Examén</th>
-                      <th style={styles.tableHeader}>Lugar</th>
-                      <th style={styles.tableHeader}>Profesional</th>
-                      <th style={styles.tableHeader}>Fecha</th>
-                      <th style={styles.tableHeader}>Acciones</th>
+                      <th scope="col" style={styles.tableHeader}>Examén</th>
+                      <th scope="col" style={styles.tableHeader}>Lugar</th>
+                      <th scope="col" style={styles.tableHeader}>Profesional</th>
+                      <th scope="col" style={styles.tableHeader}>Fecha</th>
+                      <th scope="col" style={styles.tableHeader}>Acciones</th>
 
                     </tr>
                   </thead>
@@ -267,12 +268,12 @@ const ExamenesPage = ({ studentsData }) => {
                           </td>
                           <td style={styles.tableCell}>
                             <div style={styles.actionGroup}>
-                              <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(test.id_test, test)}>
+                              <button style={styles.editEmoji} title="Editar" aria-label="Editar examen" onClick={() => handleEdit(test.id_test, test)}>
                                 <FontAwesomeIcon icon={faEdit} />
-                              </span>
-                              <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(test.id_test)}>
+                              </button>
+                              <button style={styles.deleteEmoji} title="Eliminar" aria-label="Eliminar examen" onClick={() => handleDelete(test.id_test)}>
                                 <FontAwesomeIcon icon={faTrash} />
-                              </span>
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -289,7 +290,7 @@ const ExamenesPage = ({ studentsData }) => {
       </div>
       {/* POSICIÓN CORRECTA: Justo antes de cerrar el pageWrapper */}
       {isModalOpen && (
-        <div style={styles.modalOverlay}>
+        <div style={styles.modalOverlay} role="dialog" aria-modal="true" aria-label="Formulario de examen">
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
               <h3>{isEditMode ? 'Editar Examén' : 'Nuevo Examén'}</h3>
@@ -299,7 +300,8 @@ const ExamenesPage = ({ studentsData }) => {
                   setIsEditMode(false);
                   setEditingTest(null);
                 }}
-                style={styles.closeButton}>✕
+                style={styles.closeButton}
+                aria-label="Cerrar formulario">✕
               </button>
             </div>
 
@@ -308,8 +310,9 @@ const ExamenesPage = ({ studentsData }) => {
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Nombre medico</label>
+                  <label htmlFor="exam-medico" style={styles.fieldLabel}>Nombre medico</label>
                   <input style={styles.modalInput} type="text"
+                    id="exam-medico"
                     placeholder="medico"
                     value={isEditMode ? editingTest.nombre_medico : newTest.nombre_medico}
                     onChange={(e) => {
@@ -321,8 +324,8 @@ const ExamenesPage = ({ studentsData }) => {
                     }} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Nombre examén</label>
-                  <input style={styles.modalInput} type="text" placeholder="examén"
+                  <label htmlFor="exam-nombre" style={styles.fieldLabel}>Nombre examén</label>
+                  <input style={styles.modalInput} type="text" id="exam-nombre" placeholder="examén"
                     value={isEditMode ? editingTest.nombre_examen : newTest.nombre_examen}
                     onChange={(e) => {
                       if (isEditMode) {
@@ -338,8 +341,8 @@ const ExamenesPage = ({ studentsData }) => {
               <div style={styles.formRow}>
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Descripción</label>
-                  <input style={styles.modalInput} type="text" placeholder="descripción"
+                  <label htmlFor="exam-descripcion" style={styles.fieldLabel}>Descripción</label>
+                  <input style={styles.modalInput} type="text" id="exam-descripcion" placeholder="descripción"
                     value={isEditMode ? editingTest.descripcion : newTest.descripcion}
                     onChange={(e) => {
                       if (isEditMode) {
@@ -388,8 +391,9 @@ const ExamenesPage = ({ studentsData }) => {
               {/* Fila 3: Datepicker e Input Normal */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Fecha y hora</label>
+                  <label htmlFor="exam-fecha" style={styles.fieldLabel}>Fecha y hora</label>
                   <input style={styles.modalInput} type="datetime-local"
+                    id="exam-fecha"
                     value={isEditMode ? editingTest.fecha_hora : newTest.fecha_hora}
                     onChange={(e) => {
                       if (isEditMode) {
@@ -400,8 +404,9 @@ const ExamenesPage = ({ studentsData }) => {
                     }} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Lugar</label>
+                  <label htmlFor="exam-lugar" style={styles.fieldLabel}>Lugar</label>
                   <input style={styles.modalInput} type="text"
+                    id="exam-lugar"
                     placeholder="lugar"
                     value={isEditMode ? editingTest.lugar : newTest.lugar}
                     onChange={(e) => {

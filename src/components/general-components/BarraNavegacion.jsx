@@ -72,7 +72,7 @@ const cerrarSesion = async () => {
           <img
             className='imagen-logo'
             src={recurso1}
-            alt='Logo'
+            alt='Logo SANTE - Plataforma de salud'
             style={{
               maxWidth: '30%',
               height: 'auto',
@@ -81,10 +81,10 @@ const cerrarSesion = async () => {
           />
 
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" aria-label="Abrir menu de navegacion" />
         <Navbar.Collapse className='justify-content-end navbar-collapse' id="basic-navbar-nav">
           <Nav>
-            <img src={user} className="avatar perfil" alt="Avatar" />
+            <img src={user} className="avatar perfil" alt="Foto de perfil del usuario" />
             <NavDropdown
               title={username}
               id="basic-nav-dropdown"
@@ -102,6 +102,7 @@ const cerrarSesion = async () => {
                   variant="light"
                   type="button"
                   onClick={cerrarSesion}
+                  aria-label="Cerrar sesion"
                 >
                   <FontAwesomeIcon icon={faSignOutAlt} />
                   &nbsp;&nbsp;Cerrar Sesión

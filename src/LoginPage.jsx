@@ -121,11 +121,12 @@ const LoginPage = () => {
             
             {/* START: Gradient Border Frame */}
             <div style={styles.gradientFrame}>
-              <form onSubmit={handleLogin} style={styles.loginForm}>
+              <form onSubmit={handleLogin} style={styles.loginForm} aria-label="Formulario de inicio de sesion">
                 
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>Correo electrónico</label>
+                  <label htmlFor="login-email" style={styles.label}>Correo electrónico</label>
                   <input
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -136,8 +137,9 @@ const LoginPage = () => {
                 </div>
 
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>Contraseña</label>
+                  <label htmlFor="login-password" style={styles.label}>Contraseña</label>
                   <input
+                    id="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -149,7 +151,7 @@ const LoginPage = () => {
 
 
                 {loginError && (
-                  <div style={styles.errorMessage}>
+                  <div style={styles.errorMessage} role="alert" aria-live="assertive">
                     {loginError}
                   </div>
                 )}

@@ -250,13 +250,14 @@ const CitasPage = () => {
             <div style={styles.tableCard}>
               <div style={styles.scrollWrapper}>
                 <table style={styles.table}>
+                  <caption className="sr-only">Listado de citas medicas</caption>
                   <thead style={styles.stickyHeader}>
                     <tr style={styles.tableHeaderRow}>
-                      <th style={styles.tableHeader}>Especialidad</th>
-                      <th style={styles.tableHeader}>Lugar</th>
-                      <th style={styles.tableHeader}>Profesional</th>
-                      <th style={styles.tableHeader}>Fecha</th>
-                      <th style={styles.tableHeader}>Acciones</th>
+                      <th scope="col" style={styles.tableHeader}>Especialidad</th>
+                      <th scope="col" style={styles.tableHeader}>Lugar</th>
+                      <th scope="col" style={styles.tableHeader}>Profesional</th>
+                      <th scope="col" style={styles.tableHeader}>Fecha</th>
+                      <th scope="col" style={styles.tableHeader}>Acciones</th>
 
                     </tr>
                   </thead>
@@ -305,12 +306,12 @@ const CitasPage = () => {
                           </td>
                           <td style={styles.tableCell}>
                             <div style={styles.actionGroup}>
-                              <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(appointment.id_cita, appointment)}>
+                              <button style={styles.editEmoji} title="Editar" aria-label="Editar cita" onClick={() => handleEdit(appointment.id_cita, appointment)}>
                                 <FontAwesomeIcon icon={faEdit} />
-                              </span>
-                              <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(appointment.id_cita)}>
+                              </button>
+                              <button style={styles.deleteEmoji} title="Eliminar" aria-label="Eliminar cita" onClick={() => handleDelete(appointment.id_cita)}>
                                 <FontAwesomeIcon icon={faTrash} />
-                              </span>
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -327,7 +328,7 @@ const CitasPage = () => {
       </div>
       {/* POSICIÓN CORRECTA: Justo antes de cerrar el pageWrapper */}
       {isModalOpen && (
-        <div style={styles.modalOverlay}>
+        <div style={styles.modalOverlay} role="dialog" aria-modal="true" aria-label="Formulario de cita">
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
               <h3>{isEditMode ? 'Editar Cita' : 'Nueva Cita'}</h3>
@@ -338,7 +339,8 @@ const CitasPage = () => {
                   setIsEditMode(false);
                   setEditingAppointment(null);
                 }}
-                style={styles.closeButton}>✕
+                style={styles.closeButton}
+                aria-label="Cerrar formulario">✕
               </button>
             </div>
 
@@ -347,8 +349,9 @@ const CitasPage = () => {
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Nombre medico</label>
+                  <label htmlFor="cita-medico" style={styles.fieldLabel}>Nombre medico</label>
                   <input style={styles.modalInput}
+                    id="cita-medico"
                     type="text"
                     placeholder="medico"
                     value={isEditMode ? editingAppointment.nombre_medico : newAppointment.nombre_medico}
@@ -361,8 +364,9 @@ const CitasPage = () => {
                     }} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Especialidad</label>
+                  <label htmlFor="cita-especialidad" style={styles.fieldLabel}>Especialidad</label>
                   <select
+                    id="cita-especialidad"
                     style={styles.modalInput}
                     value={isEditMode ? editingAppointment?.id_especialidad || '' : newAppointment.id_especialidad || ''}
                     onChange={(e) => {
@@ -393,8 +397,9 @@ const CitasPage = () => {
               <div style={styles.formRow}>
                 {/* Input 1: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Descripción</label>
+                  <label htmlFor="cita-descripcion" style={styles.fieldLabel}>Descripción</label>
                   <input style={styles.modalInput} type="text"
+                    id="cita-descripcion"
                     placeholder="descripción"
                     value={isEditMode ? editingAppointment.descripcion : newAppointment.descripcion}
                     onChange={(e) => {
@@ -408,8 +413,9 @@ const CitasPage = () => {
 
                 {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Tipo</label>
+                  <label htmlFor="cita-tipo" style={styles.fieldLabel}>Tipo</label>
                   <select
+                    id="cita-tipo"
                     style={styles.modalInput}
                     value={isEditMode ? editingAppointment?.tipo || '' : newAppointment.tipo || ''}
                     onChange={(e) => {
@@ -430,8 +436,9 @@ const CitasPage = () => {
               {/* Fila 3: Datepicker e Input Normal */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Fecha y hora</label>
+                  <label htmlFor="cita-fecha" style={styles.fieldLabel}>Fecha y hora</label>
                   <input style={styles.modalInput}
+                    id="cita-fecha"
                     type="datetime-local"
                     value={isEditMode ? editingAppointment.fecha_hora : newAppointment.fecha_hora}
                     onChange={(e) => {
@@ -445,8 +452,9 @@ const CitasPage = () => {
 
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Lugar</label>
+                  <label htmlFor="cita-lugar" style={styles.fieldLabel}>Lugar</label>
                   <input style={styles.modalInput} type="text"
+                    id="cita-lugar"
                     placeholder="lugar"
                     value={isEditMode ? editingAppointment.lugar : newAppointment.lugar}
                     onChange={(e) => {

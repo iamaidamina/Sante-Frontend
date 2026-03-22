@@ -211,13 +211,14 @@ const MedicamentosPage = () => {
             <div style={styles.tableCard}>
               <div style={styles.scrollWrapper}>
                 <table style={styles.table}>
+                  <caption className="sr-only">Listado de medicamentos</caption>
                   <thead style={styles.stickyHeader}>
                     <tr style={styles.tableHeaderRow}>
-                      <th style={styles.tableHeader}>Nombre Medicamento</th>
-                      <th style={styles.tableHeader}>Estado</th>
-                      <th style={styles.tableHeader}>Frecuencia</th>
-                      <th style={styles.tableHeader}>Almacenamiento</th>
-                      <th style={styles.tableHeader}>Acciones</th>
+                      <th scope="col" style={styles.tableHeader}>Nombre Medicamento</th>
+                      <th scope="col" style={styles.tableHeader}>Estado</th>
+                      <th scope="col" style={styles.tableHeader}>Frecuencia</th>
+                      <th scope="col" style={styles.tableHeader}>Almacenamiento</th>
+                      <th scope="col" style={styles.tableHeader}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -245,12 +246,12 @@ const MedicamentosPage = () => {
                           <td style={styles.tableCell}>{medication.almacenamiento || 'N/A'}</td>
                           <td style={styles.tableCell}>
                             <div style={styles.actionGroup}>
-                              <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(medication.id_medicamento, medication)}>
+                              <button style={styles.editEmoji} title="Editar" aria-label="Editar medicamento" onClick={() => handleEdit(medication.id_medicamento, medication)}>
                                 <FontAwesomeIcon icon={faEdit} />
-                              </span>
-                              <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(medication.id_medicamento)}>
+                              </button>
+                              <button style={styles.deleteEmoji} title="Eliminar" aria-label="Eliminar medicamento" onClick={() => handleDelete(medication.id_medicamento)}>
                                 <FontAwesomeIcon icon={faTrash} />
-                              </span>
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -267,7 +268,7 @@ const MedicamentosPage = () => {
       </div>
       {/* POSICIÓN CORRECTA: Justo antes de cerrar el pageWrapper */}
       {isModalOpen && (
-        <div style={styles.modalOverlay}>
+        <div style={styles.modalOverlay} role="dialog" aria-modal="true" aria-label="Formulario de medicamento">
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
               <h3>{isEditMode ? 'Editar Medicamento' : 'Nuevo Medicamento'}</h3>
@@ -277,7 +278,8 @@ const MedicamentosPage = () => {
                   setIsEditMode(false);
                   setEditingMedication(null);
                 }}
-                style={styles.closeButton}>✕</button>
+                style={styles.closeButton}
+                aria-label="Cerrar formulario">✕</button>
             </div>
 
             <form style={styles.modalForm} onSubmit={isEditMode ? handleUpdate : handleSubmit}>
@@ -285,8 +287,9 @@ const MedicamentosPage = () => {
               {/* Fila 1: Inputs Normales */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Nombre</label>
+                  <label htmlFor="med-nombre" style={styles.fieldLabel}>Nombre</label>
                   <input style={styles.modalInput}
+                    id="med-nombre"
                     type="text"
                     placeholder="Ej: Paracetamol"
                     value={isEditMode ? editingMedication.nombre : newMedication.nombre}
@@ -299,8 +302,9 @@ const MedicamentosPage = () => {
                     }} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Descripción</label>
+                  <label htmlFor="med-descripcion" style={styles.fieldLabel}>Descripción</label>
                   <input style={styles.modalInput}
+                    id="med-descripcion"
                     type="text"
                     placeholder="Ej: 500mg"
                     value={isEditMode ? editingMedication.descripcion : newMedication.descripcion}
@@ -389,8 +393,9 @@ const MedicamentosPage = () => {
               {/* Fila 3: Datepicker e Input Normal */}
               <div style={styles.formRow}>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Configuración frecuencia</label>
+                  <label htmlFor="med-frecuencia" style={styles.fieldLabel}>Configuración frecuencia</label>
                   <input style={styles.modalInput}
+                    id="med-frecuencia"
                     type="number"
                     value={isEditMode ? editingMedication.id_frecuencia : newMedication.id_frecuencia}
                     onChange={(e) => {
@@ -404,8 +409,9 @@ const MedicamentosPage = () => {
                   />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.fieldLabel}>Almacenamiento</label>
+                  <label htmlFor="med-almacenamiento" style={styles.fieldLabel}>Almacenamiento</label>
                   <input style={styles.modalInput}
+                    id="med-almacenamiento"
                     type="text"
                     placeholder="Ej: L-4562"
                     value={isEditMode ? editingMedication.almacenamiento : newMedication.almacenamiento}

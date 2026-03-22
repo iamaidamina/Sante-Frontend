@@ -88,7 +88,7 @@ export default function TourGuia({ onFinish }) {
   };
 
   return (
-    <div style={styles.overlay}>
+    <div style={styles.overlay} role="dialog" aria-modal="true" aria-label="Tour guiado de SANTE">
       <div style={styles.tarjeta}>
         {/* Indicador de paso */}
         <div style={styles.indicadorContainer}>
@@ -114,7 +114,7 @@ export default function TourGuia({ onFinish }) {
         <p style={styles.descripcion}>{paso.descripcion}</p>
 
         {/* Puntos de progreso */}
-        <div style={styles.puntosContainer}>
+        <div style={styles.puntosContainer} role="progressbar" aria-valuenow={pasoActual + 1} aria-valuemin={1} aria-valuemax={PASOS.length} aria-label="Progreso del tour">
           {PASOS.map((_, index) => (
             <div
               key={index}

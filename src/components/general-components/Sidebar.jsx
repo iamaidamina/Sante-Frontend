@@ -15,32 +15,32 @@ const Sidebar = () => {
   const [estado, setEstado] = useState(true);
 
   return (
-    <div className='sidebar'  style={{ display: 'flex', height: '100%', overflow: 'scroll initial' }}>
+    <nav className='sidebar' aria-label="Menu de navegacion principal" style={{ display: 'flex', height: '100%', overflow: 'scroll initial' }}>
       <CDBSidebar data-toggle="collapse" textColor="#fff" backgroundColor="#0A4D68">
-        <CDBSidebarHeader onClick={()=>setEstado(estado ? false : true)} prefix={<i className="fa fa-bars fa-large"></i>}>
-          <a href="/medicamentos" className="text-decoration-none" style={{ color: 'inherit' }}>
+        <CDBSidebarHeader onClick={()=>setEstado(estado ? false : true)} prefix={<i className="fa fa-bars fa-large" aria-hidden="true"></i>}>
+          <a href="/medicamentos" className="text-decoration-none" style={{ color: 'inherit' }} aria-label="Ir al inicio de SANTE">
             SANTÉ
           </a>
         </CDBSidebarHeader>
 
         <CDBSidebarContent className="sidebar-content">
           <CDBSidebarMenu>
-            <Link to="/reportes">
+            <Link to="/reportes" aria-label="Ir a Reportes">
               <CDBSidebarMenuItem icon='chart-line'> Reportes</CDBSidebarMenuItem>
             </Link>
-            <Link to="/medicamentos">
+            <Link to="/medicamentos" aria-label="Ir a Medicamentos">
               <CDBSidebarMenuItem icon="capsules">Medicamentos</CDBSidebarMenuItem>
             </Link>
-            <Link to="/citas">
+            <Link to="/citas" aria-label="Ir a Citas medicas">
               <CDBSidebarMenuItem icon="user-nurse">Citas</CDBSidebarMenuItem>
             </Link>
-            <Link to="/examenes">
+            <Link to="/examenes" aria-label="Ir a Examenes medicos">
               <CDBSidebarMenuItem icon="stethoscope">Exámenes</CDBSidebarMenuItem>
             </Link>
-            <Link to="/entregas">
+            <Link to="/entregas" aria-label="Ir a Entregas">
               <CDBSidebarMenuItem icon="car">Entregas</CDBSidebarMenuItem>
             </Link>
-            <Link to="/guia-usuario">
+            <Link to="/guia-usuario" aria-label="Ir a Guia de usuario">
               <CDBSidebarMenuItem icon="book">Guía de usuario</CDBSidebarMenuItem>
             </Link>
           </CDBSidebarMenu>
@@ -56,7 +56,7 @@ const Sidebar = () => {
           </div>
           </CDBSidebarFooter>*/}
       </CDBSidebar>
-    </div>
+    </nav>
   );
 };
 

@@ -133,12 +133,13 @@ const data = {
 
             {/* START: Gradient Border Frame */}
             <div style={styles.gradientFrame}>
-              <form onSubmit={handleRegister} style={styles.loginForm}>
+              <form onSubmit={handleRegister} style={styles.loginForm} aria-label="Formulario de registro">
                 {/* Fila 1: Usuario y Email */}
                 <div style={styles.row}>
                   <div style={styles.inputGroupHalf}>
-                    <label style={styles.label}>Nombres</label>
+                    <label htmlFor="reg-nombres" style={styles.label}>Nombres</label>
                     <input
+                      id="reg-nombres"
                       type="text"
                       placeholder="Nombre de usuario"
                       value={nombres}
@@ -147,8 +148,9 @@ const data = {
                       required />
                   </div>
                   <div style={styles.inputGroupHalf}>
-                    <label style={styles.label}>Apellidos</label>
+                    <label htmlFor="reg-apellidos" style={styles.label}>Apellidos</label>
                     <input
+                      id="reg-apellidos"
                       type="text"
                       placeholder="Apellido de usuario"
                       value={apellidos}
@@ -161,8 +163,9 @@ const data = {
                 {/* NUEVA FILA: Fecha de Nacimiento (Ocupa el centro) */}
                 <div style={styles.row}>
                   <div style={styles.inputGroupHalf}>
-                    <label style={styles.label}>Fecha de Nacimiento</label>
+                    <label htmlFor="reg-fecha" style={styles.label}>Fecha de Nacimiento</label>
                     <input
+                      id="reg-fecha"
                       type="date"
                       value={fechaNacimiento}
                       onChange={(e) => setFechaNacimiento(e.target.value)}
@@ -171,8 +174,9 @@ const data = {
                     />
                   </div>
                   <div style={styles.inputGroupHalf}>
-                    <label style={styles.label}>Correo electrónico</label>
+                    <label htmlFor="reg-email" style={styles.label}>Correo electrónico</label>
                     <input
+                      id="reg-email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -184,16 +188,18 @@ const data = {
                 {/* Fila 3: Usuario y Contraseña */}
                 <div style={styles.row}>
                   <div style={styles.inputGroupHalf}>
-                    <label style={styles.label}>Usuario</label>
+                    <label htmlFor="reg-username" style={styles.label}>Usuario</label>
                     <input type="input"
+                      id="reg-username"
                       placeholder="Usuario"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       style={styles.input} required />
                   </div>
                   <div style={styles.inputGroupHalf}>
-                    <label style={styles.label}>Contraseña</label>
+                    <label htmlFor="reg-password" style={styles.label}>Contraseña</label>
                     <input type="password"
+                      id="reg-password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="********" style={styles.input} required />
@@ -208,6 +214,7 @@ const data = {
                     checked={termsAccepted}
                     readOnly
                     style={styles.checkbox}
+                    aria-label="Aceptar terminos y condiciones"
                   />
 
                   <label style={styles.checkboxLabel}>
@@ -243,10 +250,10 @@ const data = {
                   </p>
                 )}
 
-                {registerError && <div style={styles.errorMessage}>{registerError}</div>}
+                {registerError && <div style={styles.errorMessage} role="alert">{registerError}</div>}
                 {/* ÉXITO - Verde */}
                 {registerSuccess && (
-                  <div style={{
+                  <div role="status" style={{
                     ...styles.errorMessage,
                     background: '#d1fae5',
                     color: '#065f46',

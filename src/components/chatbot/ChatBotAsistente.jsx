@@ -597,7 +597,7 @@ export default function ChatBotAsistente() {
     <div style={styles.container}>
       {/* Panel de chat */}
       {isOpen && (
-        <div style={styles.panel}>
+        <div style={styles.panel} role="dialog" aria-label="Asistente virtual SANTE">
           {/* Encabezado */}
           <div style={styles.panelHeader}>
             <div style={styles.headerInfo}>
@@ -613,7 +613,7 @@ export default function ChatBotAsistente() {
           </div>
 
           {/* Area de mensajes */}
-          <div style={styles.mensajesArea} ref={chatRef}>
+          <div style={styles.mensajesArea} ref={chatRef} role="log" aria-live="polite" aria-label="Mensajes del asistente">
             {mensajes.map((msg, index) => (
               <div
                 key={index}
@@ -651,6 +651,7 @@ export default function ChatBotAsistente() {
                 onKeyPress={handleKeyPress}
                 placeholder="Escribe tu respuesta..."
                 style={styles.inputTexto}
+                aria-label="Escribe tu respuesta"
                 autoFocus
               />
               <button onClick={enviarInput} style={styles.botonEnviar}>

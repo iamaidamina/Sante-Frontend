@@ -182,7 +182,7 @@ const ReportesPage = ({ studentsData }) => {
             {/* Gender Comparison Chart */}
             <div style={styles.chartSection}>
               <h2 style={styles.sectionTitle}>Desempeño mes de marzo</h2>
-              <div style={styles.chartCard}>
+              <div style={styles.chartCard} role="img" aria-label="Grafico de barras mostrando desempeno mensual de medicamentos y citas">
                 <ResponsiveContainer width="100%" height={400}>
                   <BarChart data={genderData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -225,13 +225,14 @@ const ReportesPage = ({ studentsData }) => {
                 {/* This wrapper enables the scrollbar */}
                 <div style={styles.scrollWrapper}>
                   <table style={styles.table}>
+                    <caption className="sr-only">Tabla de alertas</caption>
                     <thead style={styles.stickyHeader}>
                       <tr onClick={() => setSelectedStudent(student)}
                         style={{ ...styles.tableHeaderRow, cursor: 'pointer' }}>
-                        <th style={styles.tableHeader}>Concepto</th>
-                        <th style={styles.tableHeader}>Estado</th>
-                        <th style={styles.tableHeader}>Detalles</th>
-                        <th style={styles.tableHeader}>Riesgo</th>
+                        <th scope="col" style={styles.tableHeader}>Concepto</th>
+                        <th scope="col" style={styles.tableHeader}>Estado</th>
+                        <th scope="col" style={styles.tableHeader}>Detalles</th>
+                        <th scope="col" style={styles.tableHeader}>Riesgo</th>
                       </tr>
                     </thead>
                     <tbody>
