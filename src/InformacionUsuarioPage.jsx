@@ -57,6 +57,12 @@ export default function InformacionUsuarioPage() {
     fecha_nacimiento: '',
     telefono_celular: '',
   });
+  const [whatsappData, setWhatsappData] = useState({
+    whatsapp_apikey: '',
+    whatsapp_enabled: false,
+  });
+  const [savingWhatsapp, setSavingWhatsapp] = useState(false);
+  const [whatsappStatus, setWhatsappStatus] = useState({ type: '', message: '' });
   const todayIso = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
@@ -81,6 +87,10 @@ export default function InformacionUsuarioPage() {
             username: data?.username || localStorage.getItem('username') || '',
             fecha_nacimiento: normalizeDateInput(data?.fecha_nacimiento),
             telefono_celular: data?.telefono_celular || '',
+          });
+          setWhatsappData({
+            whatsapp_apikey: data?.whatsapp_apikey || '',
+            whatsapp_enabled: Boolean(data?.whatsapp_enabled),
           });
         } else {
           console.error('Error fetching user data');
@@ -186,6 +196,48 @@ export default function InformacionUsuarioPage() {
     }
   };
 
+  const handleWhatsappChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setWhatsappData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleWhatsappSubmit = async (event) => {
+    event.preventDefault();
+    setSavingWhatsapp(true);
+    setWhatsappStatus({ type: '', message: '' });
+
+    try {
+      const payload = {
+        whatsapp_apikey: whatsappData.whatsapp_apikey.trim(),
+        whatsapp_enabled: whatsappData.whatsapp_enabled,
+      };
+
+      const response = await fetchWithAuth('/api/users/me', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+
+      if (!response || !response.ok) {
+        const errorData = response ? await response.json().catch(() => ({})) : {};
+        setWhatsappStatus({ type: 'error', message: errorData?.message || 'No se pudo guardar la configuracion de WhatsApp.' });
+        return;
+      }
+
+      const result = await response.json().catch(() => null);
+      if (result?.user) {
+        setUserData((prev) => ({ ...prev, ...result.user }));
+      }
+      setWhatsappStatus({ type: 'success', message: 'Configuracion de WhatsApp guardada correctamente.' });
+    } catch {
+      setWhatsappStatus({ type: 'error', message: 'Error al guardar configuracion de WhatsApp.' });
+    } finally {
+      setSavingWhatsapp(false);
+    }
+  };
+
   const accessToken = localStorage.getItem('access_token');
   const tokenData = getUserDataFromToken(accessToken);
 
@@ -224,6 +276,11 @@ export default function InformacionUsuarioPage() {
       label: 'Fecha de creación',
       value: formatDate(userData?.fecha_creacion),
       icon: '📅',
+    },
+    {
+      label: 'Notificaciones WhatsApp',
+      value: userData?.whatsapp_enabled ? 'Activadas' : 'Desactivadas',
+      icon: '📲',
     },
     {
       label: 'Términos y condiciones',
@@ -380,6 +437,76 @@ export default function InformacionUsuarioPage() {
 
                     {saveStatus.message && (
                       <p style={saveStatus.type === 'success' ? styles.saveSuccess : styles.saveError}>{saveStatus.message}</p>
+                    )}
+                  </form>
+                </section>
+              )}
+
+              {!loading && (
+                <section style={styles.section}>
+                  <h2 style={styles.sectionTitle}>Configuracion de WhatsApp</h2>
+                  <form style={styles.editForm} onSubmit={handleWhatsappSubmit} noValidate>
+                    <div style={styles.whatsappInfo}>
+                      <p style={styles.whatsappInfoText}>
+                        Recibe recordatorios de medicamentos y citas medicas por WhatsApp.
+                        Para activar este servicio debes registrar tu numero en CallMeBot:
+                      </p>
+                      <ol style={styles.whatsappSteps}>
+                        <li>Agrega el numero <strong>+34 644 31 89 93</strong> a tus contactos de WhatsApp.</li>
+                        <li>Envia el mensaje <strong>"I allow callmebot to send me messages"</strong> al numero guardado.</li>
+                        <li>Recibiras un API Key. Copialo e ingresalo aqui abajo.</li>
+                      </ol>
+                      <a
+                        href="https://www.callmebot.com/blog/free-api-whatsapp-messages/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.whatsappLink}
+                      >
+                        Ver instrucciones completas en CallMeBot
+                      </a>
+                    </div>
+
+                    <div style={styles.inputGrid}>
+                      <div style={styles.inputGroup}>
+                        <label style={styles.inputLabel} htmlFor="whatsapp_apikey">API Key de CallMeBot</label>
+                        <input
+                          id="whatsapp_apikey"
+                          name="whatsapp_apikey"
+                          type="text"
+                          placeholder="Ej: 1234567"
+                          value={whatsappData.whatsapp_apikey}
+                          onChange={handleWhatsappChange}
+                          style={styles.inputField}
+                        />
+                      </div>
+
+                      <div style={styles.inputGroup}>
+                        <label style={styles.whatsappToggleLabel}>
+                          <input
+                            name="whatsapp_enabled"
+                            type="checkbox"
+                            checked={whatsappData.whatsapp_enabled}
+                            onChange={handleWhatsappChange}
+                            style={styles.whatsappCheckbox}
+                          />
+                          <span style={styles.whatsappToggleText}>
+                            Activar notificaciones por WhatsApp
+                          </span>
+                        </label>
+                        <p style={styles.whatsappNote}>
+                          Se usara el telefono de tu perfil ({formData.telefono_celular || 'no configurado'}).
+                        </p>
+                      </div>
+                    </div>
+
+                    <button type="submit" style={styles.saveButton} disabled={savingWhatsapp}>
+                      {savingWhatsapp ? 'Guardando...' : 'Guardar configuracion WhatsApp'}
+                    </button>
+
+                    {whatsappStatus.message && (
+                      <p style={whatsappStatus.type === 'success' ? styles.saveSuccess : styles.saveError}>
+                        {whatsappStatus.message}
+                      </p>
                     )}
                   </form>
                 </section>
@@ -669,6 +796,52 @@ const styles = {
     padding: '10px 12px',
     fontSize: '14px',
     fontWeight: '600',
+  },
+  whatsappInfo: {
+    marginBottom: '18px',
+  },
+  whatsappInfoText: {
+    margin: '0 0 10px 0',
+    fontSize: '15px',
+    color: '#334155',
+    lineHeight: 1.6,
+  },
+  whatsappSteps: {
+    margin: '0 0 12px 0',
+    paddingLeft: '20px',
+    fontSize: '14px',
+    color: '#475569',
+    lineHeight: 1.8,
+  },
+  whatsappLink: {
+    display: 'inline-block',
+    color: '#088395',
+    fontSize: '14px',
+    fontWeight: '700',
+    textDecoration: 'underline',
+  },
+  whatsappToggleLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    cursor: 'pointer',
+    padding: '12px 0',
+  },
+  whatsappCheckbox: {
+    width: '20px',
+    height: '20px',
+    accentColor: '#088395',
+    cursor: 'pointer',
+  },
+  whatsappToggleText: {
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  whatsappNote: {
+    margin: 0,
+    fontSize: '13px',
+    color: '#64748b',
   },
   noticeBox: {
     background: 'linear-gradient(135deg, #0A4D68 0%, #0f766e 100%)',
