@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUniversalAccess, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faUniversalAccess, faTimes, faVolumeUp, faStop } from '@fortawesome/free-solid-svg-icons';
 import { useAccessibility } from '../../context/ContextoAccesibilidad';
 
 const OPCIONES_DALTONISMO = [
@@ -12,6 +12,7 @@ const OPCIONES_DALTONISMO = [
 
 export default function WidgetAccesibilidad() {
   const [isOpen, setIsOpen] = useState(false);
+  const [leyendo, setLeyendo] = useState(false);
   const {
     fontStep,
     increaseFontSize,
@@ -25,9 +26,56 @@ export default function WidgetAccesibilidad() {
   } = useAccessibility();
 
   const handleReset = () => {
+    detenerLectura();
     resetAll();
     setIsOpen(false);
   };
+
+  const leerPagina = useCallback(() => {
+    if (!('speechSynthesis' in window)) {
+      alert('Tu navegador no soporta lectura en voz alta.');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const contenido = document.querySelector('.pageWrapper');
+    if (!contenido) return;
+
+    const textos = [];
+    const elementos = contenido.querySelectorAll('h1, h2, h3, h4, p, label, td, th, button, a, span, li');
+    elementos.forEach((el) => {
+      const texto = el.innerText?.trim();
+      if (texto && texto.length > 1 && !el.closest('.a11y-widget') && !el.closest('[role="dialog"]')) {
+        textos.push(texto);
+      }
+    });
+
+    const textoCompleto = textos.join('. ');
+    if (!textoCompleto) return;
+
+    const bloques = textoCompleto.match(/.{1,200}[.!?,\s]|.{1,200}$/g) || [textoCompleto];
+
+    setLeyendo(true);
+
+    bloques.forEach((bloque, index) => {
+      const utterance = new SpeechSynthesisUtterance(bloque);
+      utterance.lang = 'es-CO';
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+
+      if (index === bloques.length - 1) {
+        utterance.onend = () => setLeyendo(false);
+      }
+
+      window.speechSynthesis.speak(utterance);
+    });
+  }, []);
+
+  const detenerLectura = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setLeyendo(false);
+  }, []);
 
   return (
     <div className="a11y-widget" style={styles.container}>
@@ -101,6 +149,32 @@ export default function WidgetAccesibilidad() {
             >
               {highContrast ? 'Activado' : 'Desactivado'}
             </button>
+          </div>
+
+          {/* Seccion lectura en voz alta */}
+          <div style={styles.section}>
+            <p style={styles.sectionLabel}>Leer en voz alta</p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={leyendo ? detenerLectura : leerPagina}
+                style={{
+                  ...styles.toggleButton,
+                  background: leyendo ? '#ef4444' : '#e2e8f0',
+                  color: leyendo ? '#ffffff' : '#334155',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+                aria-label={leyendo ? 'Detener lectura' : 'Leer pagina en voz alta'}
+              >
+                <FontAwesomeIcon icon={leyendo ? faStop : faVolumeUp} />
+                {leyendo ? 'Detener' : 'Leer pagina'}
+              </button>
+            </div>
+            <p style={{ margin: '6px 0 0 0', fontSize: '12px', color: '#64748b' }}>
+              Lee el contenido de la pagina actual en voz alta.
+            </p>
           </div>
 
           {/* Seccion daltonismo */}
