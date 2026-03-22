@@ -58,7 +58,6 @@ export default function InformacionUsuarioPage() {
     telefono_celular: '',
   });
   const [whatsappData, setWhatsappData] = useState({
-    whatsapp_apikey: '',
     whatsapp_enabled: false,
   });
   const [savingWhatsapp, setSavingWhatsapp] = useState(false);
@@ -89,7 +88,6 @@ export default function InformacionUsuarioPage() {
             telefono_celular: data?.telefono_celular || '',
           });
           setWhatsappData({
-            whatsapp_apikey: data?.whatsapp_apikey || '',
             whatsapp_enabled: Boolean(data?.whatsapp_enabled),
           });
         } else {
@@ -211,7 +209,6 @@ export default function InformacionUsuarioPage() {
 
     try {
       const payload = {
-        whatsapp_apikey: whatsappData.whatsapp_apikey.trim(),
         whatsapp_enabled: whatsappData.whatsapp_enabled,
       };
 
@@ -448,38 +445,12 @@ export default function InformacionUsuarioPage() {
                   <form style={styles.editForm} onSubmit={handleWhatsappSubmit} noValidate>
                     <div style={styles.whatsappInfo}>
                       <p style={styles.whatsappInfoText}>
-                        Recibe recordatorios de medicamentos y citas medicas por WhatsApp.
-                        Para activar este servicio debes registrar tu numero en CallMeBot:
+                        Recibe recordatorios de medicamentos y citas medicas directamente en tu WhatsApp.
+                        Los mensajes se enviaran al numero de telefono registrado en tu perfil.
                       </p>
-                      <ol style={styles.whatsappSteps}>
-                        <li>Agrega el numero <strong>+34 644 31 89 93</strong> a tus contactos de WhatsApp.</li>
-                        <li>Envia el mensaje <strong>"I allow callmebot to send me messages"</strong> al numero guardado.</li>
-                        <li>Recibiras un API Key. Copialo e ingresalo aqui abajo.</li>
-                      </ol>
-                      <a
-                        href="https://www.callmebot.com/blog/free-api-whatsapp-messages/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.whatsappLink}
-                      >
-                        Ver instrucciones completas en CallMeBot
-                      </a>
                     </div>
 
                     <div style={styles.inputGrid}>
-                      <div style={styles.inputGroup}>
-                        <label style={styles.inputLabel} htmlFor="whatsapp_apikey">API Key de CallMeBot</label>
-                        <input
-                          id="whatsapp_apikey"
-                          name="whatsapp_apikey"
-                          type="text"
-                          placeholder="Ej: 1234567"
-                          value={whatsappData.whatsapp_apikey}
-                          onChange={handleWhatsappChange}
-                          style={styles.inputField}
-                        />
-                      </div>
-
                       <div style={styles.inputGroup}>
                         <label style={styles.whatsappToggleLabel}>
                           <input
@@ -495,6 +466,7 @@ export default function InformacionUsuarioPage() {
                         </label>
                         <p style={styles.whatsappNote}>
                           Se usara el telefono de tu perfil ({formData.telefono_celular || 'no configurado'}).
+                          Asegurate de que tu numero incluya el codigo de pais (ej: +573001234567).
                         </p>
                       </div>
                     </div>
@@ -805,20 +777,6 @@ const styles = {
     fontSize: '15px',
     color: '#334155',
     lineHeight: 1.6,
-  },
-  whatsappSteps: {
-    margin: '0 0 12px 0',
-    paddingLeft: '20px',
-    fontSize: '14px',
-    color: '#475569',
-    lineHeight: 1.8,
-  },
-  whatsappLink: {
-    display: 'inline-block',
-    color: '#088395',
-    fontSize: '14px',
-    fontWeight: '700',
-    textDecoration: 'underline',
   },
   whatsappToggleLabel: {
     display: 'flex',
