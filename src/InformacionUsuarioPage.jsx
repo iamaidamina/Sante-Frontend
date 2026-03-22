@@ -419,7 +419,7 @@ export default function InformacionUsuarioPage() {
                           type="text"
                           inputMode="tel"
                           placeholder="Ej: +573001234567"
-                          pattern="^\\+?[0-9\\s-]+$"
+                          pattern="^\+?[0-9\s\-]+$"
                           value={formData.telefono_celular}
                           onChange={handleInputChange}
                           style={styles.inputField}
