@@ -297,7 +297,7 @@ export default function InformacionUsuarioPage() {
   ];
 
   return (
-    <div style={styles.pageWrapper}>
+    <div style={styles.pageWrapper} className="pageWrapper">
       <Sidebar />
 
       <div style={styles.rightContainer}>

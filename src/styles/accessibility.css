@@ -1,0 +1,219 @@
+/* ============================================
+   SANTE - Estilos de Accesibilidad
+   ============================================ */
+
+/* ---- Escalado de fuente (zoom) ---- */
+body.a11y-font--1 .pageWrapper { zoom: 0.9; }
+body.a11y-font-1 .pageWrapper  { zoom: 1.15; }
+body.a11y-font-2 .pageWrapper  { zoom: 1.3; }
+body.a11y-font-3 .pageWrapper  { zoom: 1.5; }
+
+/* Botones mas grandes en nivel 2+ */
+body.a11y-font-2 button,
+body.a11y-font-3 button {
+  min-height: 48px !important;
+  min-width: 48px !important;
+}
+
+body.a11y-font-2 input,
+body.a11y-font-2 select,
+body.a11y-font-3 input,
+body.a11y-font-3 select {
+  min-height: 44px !important;
+  font-size: 16px !important;
+}
+
+body.a11y-font-2 .svg-inline--fa,
+body.a11y-font-3 .svg-inline--fa {
+  font-size: 1.4em !important;
+}
+
+/* ---- Modo Alto Contraste ---- */
+body.a11y-high-contrast {
+  background-color: #000000 !important;
+}
+
+body.a11y-high-contrast .pageWrapper {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+body.a11y-high-contrast h1,
+body.a11y-high-contrast h2,
+body.a11y-high-contrast h3,
+body.a11y-high-contrast h4,
+body.a11y-high-contrast h5,
+body.a11y-high-contrast h6,
+body.a11y-high-contrast p,
+body.a11y-high-contrast span,
+body.a11y-high-contrast label,
+body.a11y-high-contrast td,
+body.a11y-high-contrast th,
+body.a11y-high-contrast li,
+body.a11y-high-contrast a,
+body.a11y-high-contrast div {
+  color: #ffffff !important;
+}
+
+/* Campos de formulario */
+body.a11y-high-contrast input,
+body.a11y-high-contrast select,
+body.a11y-high-contrast textarea {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+body.a11y-high-contrast input::placeholder {
+  color: #aaaaaa !important;
+}
+
+/* Botones */
+body.a11y-high-contrast button {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+  font-weight: 700 !important;
+}
+
+body.a11y-high-contrast button:hover {
+  background: #FFD700 !important;
+  color: #000000 !important;
+}
+
+/* Tarjetas y contenedores */
+body.a11y-high-contrast article,
+body.a11y-high-contrast section {
+  background-color: #111111 !important;
+  border-color: #555555 !important;
+}
+
+body.a11y-high-contrast [style*="background: white"],
+body.a11y-high-contrast [style*="background: #fff"],
+body.a11y-high-contrast [style*="background: '#ffffff'"],
+body.a11y-high-contrast [style*="backgroundColor"],
+body.a11y-high-contrast [style*="background-color"] {
+  background-color: #111111 !important;
+}
+
+body.a11y-high-contrast [style*="background: linear-gradient"] {
+  background: #111111 !important;
+}
+
+/* Barra de navegacion */
+body.a11y-high-contrast .navbar {
+  background: #000000 !important;
+  border-bottom: 2px solid #FFD700 !important;
+}
+
+/* Pie de pagina */
+body.a11y-high-contrast footer,
+body.a11y-high-contrast .footer-container {
+  background: #000000 !important;
+  border-top: 2px solid #FFD700 !important;
+}
+
+/* Barra lateral */
+body.a11y-high-contrast .sidebar,
+body.a11y-high-contrast [class*="sidebar"],
+body.a11y-high-contrast [class*="Sidebar"] {
+  background: #000000 !important;
+  border-right: 2px solid #FFD700 !important;
+}
+
+/* Tablas */
+body.a11y-high-contrast tr {
+  border-bottom: 1px solid #555555 !important;
+}
+
+body.a11y-high-contrast thead {
+  background-color: #1a1a1a !important;
+}
+
+body.a11y-high-contrast table {
+  border: 1px solid #555555 !important;
+}
+
+/* Enlaces */
+body.a11y-high-contrast a {
+  color: #FFD700 !important;
+  text-decoration: underline !important;
+}
+
+/* Indicadores de foco - alta visibilidad */
+body.a11y-high-contrast *:focus {
+  outline: 3px solid #FFD700 !important;
+  outline-offset: 2px !important;
+}
+
+/* Insignias de estado */
+body.a11y-high-contrast [style*="background: #dcfce7"],
+body.a11y-high-contrast [style*="background: #dbeafe"],
+body.a11y-high-contrast [style*="background: #fef9c3"],
+body.a11y-high-contrast [style*="background: #fee2e2"] {
+  background-color: #333333 !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Modales */
+body.a11y-high-contrast [style*="z-index: 2000"],
+body.a11y-high-contrast [style*="zIndex"] {
+  background-color: #111111 !important;
+}
+
+/* Tarjetas hero y fondos con gradiente */
+body.a11y-high-contrast [style*="linear-gradient"] {
+  background: #111111 !important;
+  border: 1px solid #555555 !important;
+}
+
+/* ---- Modos de Daltonismo ---- */
+body.a11y-colorblind-deuteranopia .pageWrapper {
+  filter: url('#deuteranopia-filter');
+}
+
+body.a11y-colorblind-protanopia .pageWrapper {
+  filter: url('#protanopia-filter');
+}
+
+body.a11y-colorblind-tritanopia .pageWrapper {
+  filter: url('#tritanopia-filter');
+}
+
+/* El widget de accesibilidad nunca se filtra */
+.a11y-widget {
+  filter: none !important;
+}
+
+/* ---- Mejoras Generales de Accesibilidad ---- */
+
+/* Mejor foco para todos los modos */
+*:focus-visible {
+  outline: 2px solid #088395 !important;
+  outline-offset: 2px !important;
+}
+
+/* Clase solo para lectores de pantalla */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

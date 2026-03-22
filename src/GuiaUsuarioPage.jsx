@@ -48,7 +48,7 @@ export default function GuiaUsuarioPage() {
   }, []);
 
   return (
-    <div style={styles.pageWrapper}>
+    <div style={styles.pageWrapper} className="pageWrapper">
       <Sidebar />
 
       <div style={styles.rightContainer}>

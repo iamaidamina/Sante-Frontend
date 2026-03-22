@@ -1,5 +1,5 @@
-import React, { useState } from 'react'; // 1. Added useState
-import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
+import React, { useState } from 'react'; 
+import { useNavigate } from 'react-router-dom'; 
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
@@ -10,7 +10,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer }from 'recharts';
 import Select from 'react-select';
 const ReportesPage = ({ studentsData }) => {
-  // 4. Create internal state
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -27,13 +27,13 @@ const ReportesPage = ({ studentsData }) => {
     };
   }, []);
 
-  // 5. Create internal handleLogin
+
   const handleLogin = (e) => {
-    e.preventDefault(); // This stops the "?" refresh
+    e.preventDefault(); 
 
     if (email === 'teacher@school.com' && password === 'demo123') {
       setLoginError('');
-      navigate('/reportes'); // 6. Use navigate instead of setIsLoggedIn
+      navigate('/reportes'); 
     } else {
       setLoginError('Invalid credentials. Try teacher@school.com / demo123');
     }
@@ -59,7 +59,7 @@ const ReportesPage = ({ studentsData }) => {
     }
   ];
 
-  // Calculate gender-based averages
+
   const maleStudents = studentsData.filter(s => s.gender === 'Activo');
   const femaleStudents = studentsData.filter(s => s.gender === 'Inactivo');
 
@@ -95,7 +95,7 @@ const ReportesPage = ({ studentsData }) => {
     <div style={styles.pageWrapper} className="pageWrapper">
 
 
-      {/* Student Result  s Table */}
+      {}
       <Sidebar />
       {/* 2. mainContent llena el resto de la pantalla a la derecha */}
       {/* Contenedor de todo lo que va a la derecha del Sidebar */}
