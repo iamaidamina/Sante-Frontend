@@ -82,7 +82,7 @@ export default function ChatBotAsistente() {
     setDatosRecolectados({});
     setEsperandoInput(false);
     setInputTexto('');
-    setMensajes([{ tipo: 'bot', texto: 'Hola! Soy Santi el asistente virtual de SANTE. En que puedo ayudarte?' }]);
+    setMensajes([{ tipo: 'bot', texto: 'Hola! Soy el asistente de SANTE. En que puedo ayudarte?' }]);
   };
 
   const seleccionarOpcion = (opcionId) => {

@@ -873,6 +873,8 @@ const styles = {
     padding: '32px',
     boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
     border: '1px solid #e2e8f0',
+    position: 'relative',
+    minHeight: '450px',
   },
   tableSection: {
     marginBottom: '48px',
