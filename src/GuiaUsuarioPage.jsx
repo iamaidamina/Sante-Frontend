@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
 import Footer from './components/general-components/Footer';
@@ -38,6 +39,13 @@ const quickAccess = [
 ];
 
 export default function GuiaUsuarioPage() {
+  const navigate = useNavigate();
+
+  const iniciarTour = () => {
+    localStorage.removeItem('sante_tour_visto');
+    navigate('/medicamentos');
+  };
+
   React.useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
@@ -118,6 +126,15 @@ export default function GuiaUsuarioPage() {
                   <p style={styles.recommendationText}>Mantente atento a notificaciones del sistema para no perder citas, examenes o entregas.</p>
                   <p style={styles.recommendationText}>Cierra sesion al terminar si estas usando un equipo compartido.</p>
                 </div>
+              </section>
+
+              <section style={styles.section}>
+                <button
+                  onClick={iniciarTour}
+                  style={styles.botonTour}
+                >
+                  Iniciar tour guiado paso a paso
+                </button>
               </section>
             </main>
           </div>
@@ -330,5 +347,17 @@ const styles = {
     color: '#ffffff',
     fontSize: '15px',
     lineHeight: 1.7,
+  },
+  botonTour: {
+    width: '100%',
+    padding: '16px 24px',
+    borderRadius: '16px',
+    border: 'none',
+    background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
+    color: '#ffffff',
+    fontSize: '18px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    boxShadow: '0 8px 24px rgba(8, 131, 149, 0.25)',
   },
 };

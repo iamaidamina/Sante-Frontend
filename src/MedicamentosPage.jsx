@@ -8,13 +8,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import { fetchWithAuth } from "./utils/fetchWithAuth";
-//const MedicamentosPage = ({ studentsData }) =>
+import TourGuia from './components/guia/TourGuia';
+
 const MedicamentosPage = () => {
-  // 4. Create internal state
   const [medications, setMedications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mostrarTour, setMostrarTour] = useState(false);
   const [newMedication, setNewMedication] = useState({
     nombre: '',
     descripcion: '',
@@ -28,6 +29,9 @@ const MedicamentosPage = () => {
 
   useEffect(() => {
     fetchMedications();
+    if (!localStorage.getItem('sante_tour_visto')) {
+      setMostrarTour(true);
+    }
   }, []);
 
   const fetchMedications = async () => {
@@ -167,8 +171,12 @@ const MedicamentosPage = () => {
   return (
     <div style={styles.pageWrapper} className="pageWrapper">
 
-
-      {/* Student Result  s Table */}
+      {mostrarTour && (
+        <TourGuia onFinish={() => {
+          setMostrarTour(false);
+          localStorage.setItem('sante_tour_visto', 'true');
+        }} />
+      )}
 
       <Sidebar />
 
