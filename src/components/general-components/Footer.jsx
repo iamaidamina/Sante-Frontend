@@ -31,7 +31,9 @@ export default function Footer () {
           <div className="right box text-decoration-none link-mapa">
               <h4 className="titulo-mapa">Mapa del sitio</h4>
               <div><Link to='/' className="link-mapa">Inicio</Link></div>
-              <div><Link to='/registro' className="link-mapa">Registro</Link></div>
+              <div>
+                  <Link to='/registro' className="link-mapa">Registro</Link>
+              </div>
               <div className="media-icons">
                       <a href="/">
                           <div className="icono-footer">

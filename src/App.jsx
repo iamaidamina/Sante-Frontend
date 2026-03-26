@@ -48,7 +48,13 @@ export function App() {
         <Route exact path="/" element={<LoginPage />} />
 
     
-         <Route exact path="/registro" element={<RegistrationPage />} />
+         <Route 
+          exact 
+          path="/registro" 
+          element={<Navigate to="/" replace />} 
+        />
+        {/* Para reactivar el registro, descomenta la línea de arriba */}
+        <Route exact path="/registro" element={<RegistrationPage />} />
 
        
         <Route 
