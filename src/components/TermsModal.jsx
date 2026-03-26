@@ -45,7 +45,8 @@ const TermsModal = ({ onAccept, onClose, readOnly = false }) => {
         >
 
           <p>Bienvenido a SANTE.</p>
-
+  
+  
           <p>1. La información registrada debe ser verídica.</p>
 
           <p>2. La plataforma no reemplaza atención médica profesional.</p>
