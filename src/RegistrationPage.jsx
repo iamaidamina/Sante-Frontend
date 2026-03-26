@@ -35,64 +35,9 @@ const RegistrationPage = () => {
     };
   }, []);
   const [isLoading, setIsLoading] = useState(false);
-  const handleRegister = async (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
-
-    // 🔒 Validar aceptación de términos
-    if (!termsAccepted) {
-      setRegisterError("Debes aceptar los términos y condiciones");
-      return;
-    }
-
-    if (!recaptchaValue) {
-      setRegisterError("Debes completar el reCAPTCHA");
-      return;
-    }
-
-    setRegisterError("");
-    setIsLoading(true);
-
-const data = {
-  nombres,
-  apellidos,
-  fecha_nacimiento: fechaNacimiento,
-  username,
-  email,
-  password,
-  terms_accepted: termsAccepted,
-  recaptcha_token: recaptchaValue,
-  recaptchaToken: recaptchaValue,
-  captcha_token: recaptchaValue,
-  captchaToken: recaptchaValue,
-  captcha: recaptchaValue,
-  token: recaptchaValue,
-  'g-recaptcha-response': recaptchaValue
-};
-
-    try {
-      const response = await fetch("https://sante-backend-production-a693.up.railway.app/api/users/register", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (response.ok) {
-        setRegisterSuccess(true);
-        setRegisterError('');
-        setTimeout(() => {
-          navigate('/');
-        }, 4000);
-      } else {
-        const errorData = await response.json();
-        setRegisterError(errorData.message || 'Error en registro');
-      }
-    } catch (error) {
-      setRegisterError('Error de conexión');
-    } finally {
-      setIsLoading(false); // ← Siempre limpia
-    }
+    setRegisterError('El registro está deshabilitado temporalmente para la demo.');
   };
 
 
@@ -264,8 +209,8 @@ const data = {
                 )}
 
                 <div style={styles.buttonWrapper}>
-                  <button disabled={isLoading || !recaptchaValue} type="submit" style={styles.registroButton}>
-                    {isLoading ? 'Registrando...' : 'Registrarse'}
+                  <button disabled style={styles.registroButton}>
+                    Registro deshabilitado por demo
                   </button>
                 </div>
               </form>
