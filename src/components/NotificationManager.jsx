@@ -75,9 +75,40 @@ export default function NotificationManager() {
 
     });
 
+    // Listener para recordatorio de cita médica
+    socket.on("appointment_reminder", (data) => {
+      if (document.visibilityState === "visible") {
+        toast.info(
+          <div className="appointment-toast-content">
+            <strong>📅 Recordatorio de cita médica</strong>
+            <p>{data.mensaje}</p>
+            <p><b>Fecha:</b> {data.fecha}</p>
+            <p><b>Médico:</b> {data.medico}</p>
+            <p><b>Lugar:</b> {data.lugar}</p>
+            {data.tipo && <p><b>Tipo:</b> {data.tipo}</p>}
+          </div>,
+          {
+            position: "top-right",
+            autoClose: 10000
+          }
+        );
+      } else {
+        if (Notification.permission === "granted") {
+          const notification = new Notification("Recordatorio de cita médica", {
+            body: data.mensaje,
+            icon: undefined // Puedes poner un ícono personalizado si lo deseas
+          });
+          notification.onclick = () => {
+            window.focus();
+          };
+        }
+      }
+    });
+
     return () => {
       socket.off("connect");
       socket.off("uv_alert");
+      socket.off("appointment_reminder");
     };
 
   }, []);
