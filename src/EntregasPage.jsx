@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'; // 1. Added useState
-import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
+import React, { useState, useEffect, useRef } from 'react'; 
+import { useNavigate } from 'react-router-dom'; 
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
@@ -140,11 +140,7 @@ const EntregasPage = ({ studentsData }) => {
   };
 
   const handleEdit = (id, delivery) => {
-    /*
-    setEditingMedication({ ...medication, id_medicamento: id });
-    setIsEditMode(true);
-    setIsModalOpen(true);  // ← THIS OPENS MODAL
-    */
+    
     const cleanDelivery = {
       id_entrega: id,
       lugar_compra: delivery.lugar_compra || '',
@@ -153,7 +149,7 @@ const EntregasPage = ({ studentsData }) => {
       comentario: delivery.comentario || '',
       lugar_entrega: delivery.lugar_entrega || '',
       fecha_llegada: delivery.fecha_llegada
-        ? new Date(delivery.fecha_llegada).toISOString().slice(0, 10)  // ✅ "2026-03-14"
+        ? new Date(delivery.fecha_llegada).toISOString().slice(0, 10)  
         : ''
     };
 
@@ -183,7 +179,7 @@ const EntregasPage = ({ studentsData }) => {
         setIsEditMode(false);
         setEditingDelivery(null);
         setIsModalOpen(false);
-        fetchDeliveries(); // Refresh list
+        fetchDeliveries(); 
       } else {
         alert('Error al actualizar');
       }
@@ -203,8 +199,7 @@ const EntregasPage = ({ studentsData }) => {
     return domiciliario?.nombre_domiciliario ||
       'N/A';
   };
-
-  // ✅ Now safe to return early
+  
   if (isLoading) {
     return (
       <div style={styles.pageWrapper}>
@@ -228,7 +223,7 @@ const EntregasPage = ({ studentsData }) => {
     <div style={styles.pageWrapper} className="pageWrapper">
 
 
-      {/* Student Result  s Table */}
+      {}
       <Sidebar />
       {/* 2. mainContent llena el resto de la pantalla a la derecha */}
       {/* Contenedor de todo lo que va a la derecha del Sidebar */}
@@ -407,7 +402,7 @@ const EntregasPage = ({ studentsData }) => {
                 </div>
 
 
-                {/* Input 2: Traditional Button Style */}
+                {}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Nombre domiciliario</label>
                   <select
@@ -552,15 +547,15 @@ const EntregasPage = ({ studentsData }) => {
 };
 
 const styles = {
-  // ... (previous styles remain the same)
+ 
   rightContainer: {
-    gridColumn: '2',         // Forces this to stay in the second column
+    gridColumn: '2',        
     display: 'flex',
     flexDirection: 'column',
-    minWidth: 0,             // Crucial to stop table from expanding the grid
+    minWidth: 0,             
     height: '100vh',
     width: '100%',
-    overflowY: 'auto',       // Only the right side scrolls
+    overflowY: 'auto',       
   },
   mainContent: {
     flex: 1,                  // Empuja el footer hacia abajo si hay poco contenido

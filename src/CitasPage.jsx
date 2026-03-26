@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'; // 1. Added useState
-import { useNavigate } from 'react-router-dom'; // 2. Added useNavigate
+import React, { useState, useEffect } from 'react'; 
+import { useNavigate } from 'react-router-dom'; 
 import Footer from './components/general-components/Footer';
 import Sidebar from './components/general-components/Sidebar';
 import BarraNavegacion from './components/general-components/BarraNavegacion';
@@ -10,15 +10,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import Select from 'react-select';
 import { fetchWithAuth } from './utils/fetchWithAuth';
 const CitasPage = () => {
-  // 4. Create internal state
-  /*
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selected, setSelected] = useState({ value: 'individual', label: 'Individual' });
-  const navigate = useNavigate();
-  */
+  
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -107,7 +99,7 @@ const CitasPage = () => {
           fecha_hora: ''
         });
         setIsModalOpen(false);
-        fetchAppointments(); // Refresh list
+        fetchAppointments(); 
       } else {
         alert('Error al crear cita');
       }
@@ -123,18 +115,14 @@ const CitasPage = () => {
         method: 'DELETE'
       });
 
-      fetchAppointments(); // Refresh list
+      fetchAppointments(); 
     } catch (error) {
       alert('Error al eliminar');
     }
   };
 
   const handleEdit = (id, appointment) => {
-    /*
-    setEditingMedication({ ...medication, id_medicamento: id });
-    setIsEditMode(true);
-    setIsModalOpen(true);  // ← THIS OPENS MODAL
-    */
+    
     const cleanAppoinment = {
       id_cita: id,
       nombre_medico: appointment.nombre_medico || '',
@@ -173,7 +161,7 @@ const CitasPage = () => {
         setIsEditMode(false);
         setEditingAppointment(null);
         setIsModalOpen(false);
-        fetchAppointments(); // Refresh list
+        fetchAppointments(); 
       } else {
         alert('Error al actualizar');
       }
@@ -196,8 +184,7 @@ const CitasPage = () => {
            specialty?.especialidad || 
            'N/A';
 };
-
-  // ✅ Now safe to return early
+  
   if (isLoading) {
     return (
       <div style={styles.pageWrapper}>
@@ -222,7 +209,7 @@ const CitasPage = () => {
     <div style={styles.pageWrapper} className="pageWrapper">
 
 
-      {/* Student Result  s Table */}
+      {}
       <Sidebar />
       {/* 2. mainContent llena el resto de la pantalla a la derecha */}
       {/* Contenedor de todo lo que va a la derecha del Sidebar */}
@@ -478,15 +465,15 @@ const CitasPage = () => {
 };
 
 const styles = {
-  // ... (previous styles remain the same)
+  
   rightContainer: {
-    gridColumn: '2',         // Forces this to stay in the second column
+    gridColumn: '2',         
     display: 'flex',
     flexDirection: 'column',
-    minWidth: 0,             // Crucial to stop table from expanding the grid
+    minWidth: 0,            
     height: '100vh',
     width: '100%',
-    overflowY: 'auto',       // Only the right side scrolls
+    overflowY: 'auto',       
   },
   mainContent: {
     flex: 1,                  // Empuja el footer hacia abajo si hay poco contenido
@@ -510,16 +497,15 @@ const styles = {
   loginForm: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px', // Reduced gap for a tighter feel
+    gap: '16px', 
     background: '#ffffff',
     padding: '30px 24px',
     borderRadius: '17px',
   },
 
-  // NEW: Forgot Password Styles
   forgotPasswordContainer: {
     textAlign: 'center',
-    marginTop: '-8px', // Pulls it closer to the password input
+    marginTop: '-8px', 
   },
   forgotPasswordLink: {
     fontSize: '13px',
@@ -537,7 +523,7 @@ const styles = {
   },
   buttonWrapper: {
     display: 'flex',
-    justifyContent: 'center', // Centers the smaller button
+    justifyContent: 'center', 
     marginTop: '8px',
   },
   logoIcon: { display: 'inline-block', marginBottom: '24px' },
@@ -550,9 +536,9 @@ const styles = {
     background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
     color: 'white',
     border: 'none',
-    padding: '12px 24px', // Reduced padding from 16px/32px
+    padding: '12px 24px', 
     borderRadius: '10px',
-    fontSize: '15px', // Slightly smaller font
+    fontSize: '15px', 
     fontWeight: '700',
     fontFamily: "'Syne', sans-serif",
     cursor: 'pointer',
@@ -562,8 +548,8 @@ const styles = {
     gap: '8px',
     transition: 'all 0.3s ease',
     boxShadow: '0 4px 12px rgba(10, 77, 104, 0.2)',
-    width: 'auto', // Button no longer takes full width
-    minWidth: '160px', // Ensures it doesn't get TOO small
+    width: 'auto', 
+    minWidth: '160px', 
   },
   buttonArrow: { fontSize: '20px' },
   errorMessage: { background: '#fee2e2', color: '#991b1b', padding: '12px 16px', borderRadius: '8px', fontSize: '14px', textAlign: 'center' },
@@ -586,7 +572,7 @@ const styles = {
   statLabel: { fontSize: '13px', color: 'rgba(255,255,255,0.85)' },
   pageWrapper: {
     display: 'grid',
-    // Column 1: Sidebar width | Column 2: The rest of the screen
+    
     gridTemplateColumns: '0px 1fr',
     minHeight: '100vh',
     width: '100vw',
@@ -594,26 +580,26 @@ const styles = {
     padding: 0,
     backgroundColor: '#f1f5f9',
   },
-  // Ensure the middle content grows to push the footer down
+  
   loginContainer: {
     flex: '1',
     display: 'flex',
-    // ... rest of your styles
+    
   },
 
   iconBigContainer: {
-    position: 'relative', // This is the "anchor" for the icons
-    width: '300px',      // Adjust based on your design
-    height: '200px',     // Give it enough height to show both
-    margin: '0 auto',    // Centers the container itself
+    position: 'relative', 
+    width: '300px',      
+    height: '200px',     
+    margin: '0 auto',    
   },
   floatingBigIcon: {
-    position: 'absolute', // Allows them to overlap or move freely
+    position: 'absolute', 
     transition: 'all 0.3s ease',
   },
   iconBigStyle: {
     marginTop: '100px',
-    width: '250px',       // Ensure they have a consistent size
+    width: '250px',       
     height: 'auto',
   },
   tableSection: {
@@ -624,13 +610,13 @@ const styles = {
   tableCard: {
     background: 'white',
     borderRadius: '20px',
-    width: '100%',            // IMPORTANTE: La tarjeta debe ocupar el 100%
+    width: '100%',           
     boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
   },
   table: {
-    width: '100%',           // Table fills its container exactly
+    width: '100%',           
     borderCollapse: 'collapse',
   },
   tableHeaderRow: {
@@ -744,11 +730,11 @@ const styles = {
     background: '#fef3c7',
     color: '#92400e',
   },
-  // NEW: The container that actually scrolls
+  
   scrollWrapper: {
     width: '100%',
-    overflowX: 'auto',       // If table is too wide, it scrolls INTERNALLY
-    maxHeight: '60vh',       // Optional: makes table height scrollable too
+    overflowX: 'auto',       
+    maxHeight: '60vh',      
   },
   actionButton: {
     padding: '10px 20px',
@@ -763,7 +749,7 @@ const styles = {
     boxShadow: '0 4px 6px rgba(5, 195, 221, 0.2)',
   },
 
-  // NEW: Keeps the header visible while scrolling
+  
   stickyHeader: {
     position: 'sticky',
     top: 0,
@@ -783,17 +769,12 @@ const styles = {
     backgroundColor: '#f8fafc', // Fondo sólido para que no se vea el texto de abajo
     borderBottom: '2px solid #e2e8f0',
   },
-  /*
-  navbarWrapper: {
-    width: '100%',  // Force the navbar to stretch
-    zIndex: 100,    // Ensure it stays on top
-  },
-  */
+  
   titleContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '180px',           // Espacio entre el botón y el título
-    marginBottom: '24px',  // Espacio respecto a la tabla
+    gap: '180px',           
+    marginBottom: '24px',  
   },
   scoreCell: {
     display: 'flex',
@@ -804,18 +785,18 @@ const styles = {
   actionGroup: {
     display: 'flex',
     gap: '8px',
-    marginLeft: 'auto', // Pushes icons to the right side of the cell
+    marginLeft: 'auto', 
   },
   editEmoji: {
     cursor: 'pointer',
     fontSize: '18px',
-    filter: 'drop-shadow(0px 0px 2px rgba(0,0,255,0.3))', // Subtle blue glow
+    filter: 'drop-shadow(0px 0px 2px rgba(0,0,255,0.3))', 
     transition: 'transform 0.2s',
   },
   deleteEmoji: {
     cursor: 'pointer',
     fontSize: '18px',
-    filter: 'sepia(1) saturate(10000%) hue-rotate(345deg)', // This forces the emoji to look Red
+    filter: 'sepia(1) saturate(10000%) hue-rotate(345deg)', 
     transition: 'transform 0.2s',
   },
   modalOverlay: {
@@ -824,11 +805,11 @@ const styles = {
     left: 0,
     width: '100vw',
     height: '100vh',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dims the background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 2000, // Stays above everything (Sidebar/Navbar)
+    zIndex: 2000, 
   },
   modalContent: {
     background: 'white',
@@ -836,7 +817,7 @@ const styles = {
     borderRadius: '20px',
     width: '600px',
     boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-    animation: 'emerge 0.3s ease-out', // You can add this @keyframes in your CSS
+    animation: 'emerge 0.3s ease-out', 
   },
   modalHeader: {
     display: 'flex',

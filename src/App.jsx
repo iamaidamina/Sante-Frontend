@@ -13,7 +13,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NotificationManager from "./components/NotificationManager";
 
-// Sample student data 
+
 const studentsData = [
   { id: 1,concepto:"Furosemida 40 mg",medicamento: "Losartán 50 mg",domiciliario:"Valentina Rojas",compra:"Drogueria San Jorge",fecha: 'Martes, 14 de Marzo del 2026',profesional: 'Andrés Vargas',especialidad: 'Cardiología',lugar: 'Clinica Imbanaco',name: 'Ana Rodríguez', gender: 'Activo',estado: 'Pendiente', frecuencia: '2:00',almacenamiento: 'Cajón Habitación',problemSolving: 85, criticalThinking: 92, creativity: 78, overall: 85 },
   { id: 2,concepto:"Urología", medicamento: "Atorvastatina 40 mg",domiciliario:"Thiago Martínez",compra:"D1",fecha: 'Martes, 15 de Abril del 2026',profesional: 'Ana Rodríguez',especialidad: 'Dermatología',lugar: 'Clinica Nuestra',name: 'Carlos Méndez', gender: 'Inactivo', estado: 'Entregado',frecuencia: '00:00',almacenamiento: 'Nevera',problemSolving: 78, criticalThinking: 85, creativity: 88, overall: 84 },
@@ -28,7 +28,7 @@ const studentsData = [
 ];
 
 export function App() {
-  // Global styles application
+
   React.useEffect(() => {
     const style = document.documentElement.style;
     const bodyStyle = document.body.style;

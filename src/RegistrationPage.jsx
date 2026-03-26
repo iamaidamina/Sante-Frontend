@@ -70,7 +70,7 @@ const data = {
 };
 
     try {
-      const response = await fetch('https://sante-backend-production2.up.railway.app/api/users/register', {
+      const response = await fetch('sante-backend-production-a693.up.railway.app/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
