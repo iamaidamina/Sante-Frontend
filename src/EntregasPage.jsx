@@ -113,7 +113,7 @@ const EntregasPage = ({ studentsData }) => {
           nombre_producto: '',
           comentario: '',
           lugar_entrega: '',
-          fecha_llegada: null,
+          fecha_llegada: '',
         });
         setIsModalOpen(false);
         fetchDeliveries(); // Refresh list
