@@ -16,7 +16,7 @@ export default function NotificationManager() {
 
     socket.on("connect", () => {
       console.log("Socket conectado:", socket.id);
-      socket.emit("join_user_room", `user_${userId}`);
+      socket.emit("join_user_room", userId);
     });
 
     socket.on("uv_alert", (data) => {
