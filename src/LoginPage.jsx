@@ -87,6 +87,9 @@ const LoginPage = () => {
 
         if (userId) {
           localStorage.setItem('user_id', String(userId));
+          console.log('[LOGIN] user_id guardado en localStorage:', userId);
+        } else {
+          console.warn('[LOGIN] user_id NO encontrado en la respuesta del backend');
         }
         // 🔵 Forzar reconexión del socket
         socket.disconnect();
