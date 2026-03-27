@@ -175,7 +175,7 @@ const LoginPage = () => {
                 */}
                 {/* NEW: Forgot Password Link */}
                 <div style={styles.forgotPasswordContainer}>
-                  <Link to='/registro' className="link-mapa" style={styles.registrationLink}>Registrarse</Link>
+                  {/*<Link to='/registro' className="link-mapa" style={styles.registrationLink}>Registrarse</Link>*/}
                 </div>
               </form>
             </div>
