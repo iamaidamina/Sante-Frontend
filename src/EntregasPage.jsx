@@ -306,12 +306,12 @@ const EntregasPage = ({ studentsData }) => {
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.actionGroup}>
-                            <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(delivery.id_entrega, delivery)}>
+                            <button style={styles.editEmoji} title="Editar" aria-label="Editar cita" onClick={() => handleEdit(delivery.id_entrega, delivery)}>
                               <FontAwesomeIcon icon={faEdit} />
-                            </span>
-                            <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(delivery.id_entrega)}>
+                            </button>
+                            <button style={styles.deleteEmoji} title="Eliminar" aria-label="Eliminar cita" onClick={() => handleDelete(delivery.id_entrega)}>
                               <FontAwesomeIcon icon={faTrash} />
-                            </span>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -868,7 +868,7 @@ const styles = {
     gap: '8px',
     marginLeft: 'auto', 
   },
-  editEmoji: {
+   editEmoji: {
     cursor: 'pointer',
     fontSize: '18px',
     filter: 'drop-shadow(0px 0px 2px rgba(0,0,255,0.3))', 
