@@ -501,13 +501,67 @@ export default function ChatBotAsistente() {
   };
 
   // --- ENVIAR INPUT ---
-  const enviarInput = () => {
+  // Detectar si la pregunta es sobre medicamentos, efectos secundarios, automedicación o sobredosis
+  const esPreguntaGemini = (texto) => {
+    const patrones = [
+      /efectos? secundarios?/i,
+      /automedica(cion|r|do|da)?/i,
+      /sobredosis/i,
+      /qué pasa si tomo/i,
+      /qué pasa si me automedico/i,
+      /qué pasa si tomo sobredosis/i,
+      /interacciones?/i,
+      /puedo mezclar/i,
+      /es peligroso/i,
+      /riesgos?/i,
+      /puedo tomar/i,
+      /puedo consumir/i,
+      /contraindicaciones?/i,
+      /para qué sirve/i,
+      /información de/i,
+      /informacion de/i,
+      /medicamento/i
+    ];
+    return patrones.some((pat) => pat.test(texto));
+  };
+
+  const enviarInput = async () => {
     const valor = inputTexto.trim();
     if (!valor) return;
 
     agregarMensajeUsuario(valor);
     setInputTexto('');
     setEsperandoInput(false);
+
+    // Si es pregunta para Gemini, consulta al backend
+    if (esPreguntaGemini(valor)) {
+      agregarMensajeBot('Consultando a Gemini, por favor espera...');
+      setEnviando(true);
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL || 'https://sante-backend-production-a693.up.railway.app'}/api/gemini/chat`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ pregunta: valor })
+          }
+        );
+        const data = await response.json();
+        if (data && data.respuesta) {
+          agregarMensajeBot(data.respuesta);
+        } else {
+          agregarMensajeBot('No se pudo obtener respuesta de Gemini.');
+        }
+      } catch (err) {
+        agregarMensajeBot('Error al consultar Gemini. Intenta de nuevo más tarde.');
+      }
+      setEnviando(false);
+      return;
+    }
 
     if (flujoActual === 'medicamento') {
       procesarPasoMedicamento(valor);
