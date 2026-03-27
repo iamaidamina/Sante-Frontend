@@ -98,8 +98,8 @@ const LoginPage = () => {
         socket.once("connect", () => {
           console.log("Socket conectado:", socket.id);
           if (userId) {
-            socket.emit("join_user_room", userId);
-            console.log("Uniendo usuario a room:", userId);
+            socket.emit("join_user_room", `user_${userId}`);
+            console.log("Uniendo usuario a room:", `user_${userId}`);
           }
         });
         navigate('/medicamentos');
