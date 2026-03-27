@@ -20,6 +20,7 @@ export default function NotificationManager() {
     });
 
     socket.on("uv_alert", (data) => {
+      console.log("[SOCKET] uv_alert recibido:", data);
 
       if (document.visibilityState === "visible") {
 
