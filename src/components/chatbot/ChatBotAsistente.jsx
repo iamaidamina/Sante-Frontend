@@ -139,6 +139,7 @@ const MENU_PRINCIPAL = [
   { id: 'examen', label: 'Registrar un examen' },
   { id: 'diagnostico', label: 'Acabo de recibir un diagnostico' },
   { id: 'preguntas', label: 'Tengo una pregunta' },
+  { id: 'duda_especifica', label: 'Tengo una duda específica' },
 ];
 
 export default function ChatBotAsistente() {
@@ -213,6 +214,12 @@ export default function ChatBotAsistente() {
       agregarMensajeUsuario('Tengo una pregunta');
       setFlujoActual('preguntas');
       agregarMensajeBot('Selecciona la pregunta que te interesa:');
+    } else if (opcionId === 'duda_especifica') {
+      agregarMensajeUsuario('Tengo una duda específica');
+      setFlujoActual('duda_especifica');
+      agregarMensajeBot('Por favor, escribe tu pregunta específica sobre medicamentos, efectos secundarios, automedicación o sobredosis.');
+      setEsperandoInput(true);
+      setInputTipo('text');
     } else if (opcionId === 'menu') {
       mostrarMenuPrincipal();
     }
@@ -569,6 +576,35 @@ export default function ChatBotAsistente() {
       procesarPasoCita(valor);
     } else if (flujoActual === 'examen') {
       procesarPasoExamen(valor);
+    } else if (flujoActual === 'duda_especifica') {
+      // Siempre enviar a Gemini
+      agregarMensajeBot('Consultando a Gemini, por favor espera...');
+      setEnviando(true);
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL || 'https://sante-backend-production-a693.up.railway.app'}/api/gemini/chat`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ pregunta: valor })
+          }
+        );
+        const data = await response.json();
+        if (data && data.respuesta) {
+          agregarMensajeBot(data.respuesta);
+        } else {
+          agregarMensajeBot('No se pudo obtener respuesta de Gemini.');
+        }
+      } catch (err) {
+        agregarMensajeBot('Error al consultar Gemini. Intenta de nuevo más tarde.');
+      }
+      setEnviando(false);
+      setFlujoActual('finalizado');
+      return;
     }
   };
 
