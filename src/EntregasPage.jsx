@@ -113,7 +113,7 @@ const EntregasPage = ({ studentsData }) => {
           nombre_producto: '',
           comentario: '',
           lugar_entrega: '',
-          fecha_llegada: '',
+          fecha_llegada: null,
         });
         setIsModalOpen(false);
         fetchDeliveries(); // Refresh list
@@ -306,12 +306,12 @@ const EntregasPage = ({ studentsData }) => {
                         </td>
                         <td style={styles.tableCell}>
                           <div style={styles.actionGroup}>
-                            <button style={styles.editEmoji} title="Editar" aria-label="Editar cita" onClick={() => handleEdit(delivery.id_entrega, delivery)}>
+                            <span style={styles.editEmoji} title="Editar" onClick={() => handleEdit(delivery.id_entrega, delivery)}>
                               <FontAwesomeIcon icon={faEdit} />
-                            </button>
-                            <button style={styles.deleteEmoji} title="Eliminar" aria-label="Eliminar cita" onClick={() => handleDelete(delivery.id_entrega)}>
+                            </span>
+                            <span style={styles.deleteEmoji} title="Eliminar" onClick={() => handleDelete(delivery.id_entrega)}>
                               <FontAwesomeIcon icon={faTrash} />
-                            </button>
+                            </span>
                           </div>
                         </td>
                       </tr>
@@ -495,6 +495,7 @@ const EntregasPage = ({ studentsData }) => {
                   </select>
                 </div>
 
+                {/* Campo condicional: Orden médica (solo si es medicamento) */}
                 <div
                   style={{
                     ...styles.inputGroup,
@@ -508,6 +509,7 @@ const EntregasPage = ({ studentsData }) => {
                       id="fileLateral"
                       accept="image/*,application/pdf"
                       style={{
+                        // Estilos para input visible y bonito
                         width: '100%',
                         height: '40px',
                         padding: '8px 12px',
@@ -522,10 +524,11 @@ const EntregasPage = ({ studentsData }) => {
                         const file = e.target.files[0];
                         if (file) {
                           console.log('Archivo:', file.name, file.size);
+                          // Procesa tu archivo aquí
                         }
                       }}
                       onClick={(e) => {
-                        e.target.value = ''; 
+                        e.target.value = ''; // Limpia para permitir re-selección del mismo archivo
                       }}
                     />
                   </div>
@@ -555,8 +558,9 @@ const styles = {
     overflowY: 'auto',       
   },
   mainContent: {
-    flex: 1,                  
+    flex: 1,                  // Empuja el footer hacia abajo si hay poco contenido
     display: 'flex',
+    //flexDirection: 'column',
     width: '100%',
     padding: '40px',
     boxSizing: 'border-box',
@@ -565,7 +569,7 @@ const styles = {
   rightSide: { flex: '0 0 65%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', overflowY: 'auto' },
   loginCard: { width: '100%', maxWidth: '420px', padding: '0 20px' },
   loginHeader: { textAlign: 'center', marginBottom: '32px' },
-
+  // NEW: Gradient Frame Style
   gradientFrame: {
     padding: '3px',
     background: 'linear-gradient(135deg, #0A4D68 0%, #05C3DD 100%)',
@@ -575,15 +579,16 @@ const styles = {
   loginForm: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px', 
+    gap: '16px', // Reduced gap for a tighter feel
     background: '#ffffff',
     padding: '30px 24px',
     borderRadius: '17px',
   },
 
+  // NEW: Forgot Password Styles
   forgotPasswordContainer: {
     textAlign: 'center',
-    marginTop: '-8px', 
+    marginTop: '-8px', // Pulls it closer to the password input
   },
   forgotPasswordLink: {
     fontSize: '13px',
@@ -601,7 +606,7 @@ const styles = {
   },
   buttonWrapper: {
     display: 'flex',
-    justifyContent: 'center', 
+    justifyContent: 'center', // Centers the smaller button
     marginTop: '8px',
   },
   logoIcon: { display: 'inline-block', marginBottom: '24px' },
@@ -614,9 +619,9 @@ const styles = {
     background: 'linear-gradient(135deg, #0A4D68 0%, #088395 100%)',
     color: 'white',
     border: 'none',
-    padding: '12px 24px', 
+    padding: '12px 24px', // Reduced padding from 16px/32px
     borderRadius: '10px',
-    fontSize: '15px', 
+    fontSize: '15px', // Slightly smaller font
     fontWeight: '700',
     fontFamily: "'Syne', sans-serif",
     cursor: 'pointer',
@@ -626,8 +631,8 @@ const styles = {
     gap: '8px',
     transition: 'all 0.3s ease',
     boxShadow: '0 4px 12px rgba(10, 77, 104, 0.2)',
-    width: 'auto', 
-    minWidth: '160px', 
+    width: 'auto', // Button no longer takes full width
+    minWidth: '160px', // Ensures it doesn't get TOO small
   },
   buttonArrow: { fontSize: '20px' },
   errorMessage: { background: '#fee2e2', color: '#991b1b', padding: '12px 16px', borderRadius: '8px', fontSize: '14px', textAlign: 'center' },
@@ -650,6 +655,7 @@ const styles = {
   statLabel: { fontSize: '13px', color: 'rgba(255,255,255,0.85)' },
   pageWrapper: {
     display: 'grid',
+    // Column 1: Sidebar width | Column 2: The rest of the screen
     gridTemplateColumns: '0px 1fr',
     minHeight: '100vh',
     width: '100vw',
@@ -657,25 +663,26 @@ const styles = {
     padding: 0,
     backgroundColor: '#f1f5f9',
   },
- 
+  // Ensure the middle content grows to push the footer down
   loginContainer: {
     flex: '1',
     display: 'flex',
+    // ... rest of your styles
   },
 
   iconBigContainer: {
-    position: 'relative', 
-    width: '300px',      
-    height: '200px',     
-    margin: '0 auto',    
+    position: 'relative', // This is the "anchor" for the icons
+    width: '300px',      // Adjust based on your design
+    height: '200px',     // Give it enough height to show both
+    margin: '0 auto',    // Centers the container itself
   },
   floatingBigIcon: {
-    position: 'absolute', 
+    position: 'absolute', // Allows them to overlap or move freely
     transition: 'all 0.3s ease',
   },
   iconBigStyle: {
     marginTop: '100px',
-    width: '250px',       
+    width: '250px',       // Ensure they have a consistent size
     height: 'auto',
   },
   tableSection: {
@@ -686,13 +693,13 @@ const styles = {
   tableCard: {
     background: 'white',
     borderRadius: '20px',
-    width: '100%',            
+    width: '100%',            // IMPORTANTE: La tarjeta debe ocupar el 100%
     boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
   },
   table: {
-    width: '100%',           
+    width: '100%',           // Table fills its container exactly
     borderCollapse: 'collapse',
   },
   tableHeaderRow: {
@@ -806,22 +813,22 @@ const styles = {
     background: '#fef3c7',
     color: '#92400e',
   },
-  
+  // NEW: The container that actually scrolls
   scrollWrapper: {
     width: '100%',
-    overflowX: 'auto',       
-    maxHeight: '60vh',       
+    overflowX: 'auto',       // If table is too wide, it scrolls INTERNALLY
+    maxHeight: '60vh',       // Optional: makes table height scrollable too
   },
 
- 
+  // NEW: Keeps the header visible while scrolling
   stickyHeader: {
     position: 'sticky',
     top: 0,
-    zIndex: 10, 
-    backgroundColor: '#f8fafc', 
+    zIndex: 10, // Asegura que esté por encima de las filas
+    backgroundColor: '#f8fafc', // Obligatorio para que no se transparente
   },
   tableHeader: {
-    position: 'sticky', 
+    position: 'sticky', // Añadido aquí también
     top: 0,
     padding: '20px 24px',
     textAlign: 'left',
@@ -830,7 +837,7 @@ const styles = {
     color: '#64748b',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    backgroundColor: '#f8fafc', 
+    backgroundColor: '#f8fafc', // Fondo sólido para que no se vea el texto de abajo
     borderBottom: '2px solid #e2e8f0',
   },
   /*
@@ -854,8 +861,8 @@ const styles = {
   titleContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '180px',           
-    marginBottom: '24px',  
+    gap: '180px',           // Espacio entre el botón y el título
+    marginBottom: '24px',  // Espacio respecto a la tabla
   },
   scoreCell: {
     display: 'flex',
@@ -866,18 +873,18 @@ const styles = {
   actionGroup: {
     display: 'flex',
     gap: '8px',
-    marginLeft: 'auto', 
+    marginLeft: 'auto', // Pushes icons to the right side of the cell
   },
-   editEmoji: {
+  editEmoji: {
     cursor: 'pointer',
     fontSize: '18px',
-    filter: 'drop-shadow(0px 0px 2px rgba(0,0,255,0.3))', 
+    filter: 'drop-shadow(0px 0px 2px rgba(0,0,255,0.3))', // Subtle blue glow
     transition: 'transform 0.2s',
   },
   deleteEmoji: {
     cursor: 'pointer',
     fontSize: '18px',
-    filter: 'sepia(1) saturate(10000%) hue-rotate(345deg)', 
+    filter: 'sepia(1) saturate(10000%) hue-rotate(345deg)', // This forces the emoji to look Red
     transition: 'transform 0.2s',
   },
   modalOverlay: {
@@ -886,11 +893,11 @@ const styles = {
     left: 0,
     width: '100vw',
     height: '100vh',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dims the background
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 2000, 
+    zIndex: 2000, // Stays above everything (Sidebar/Navbar)
   },
   modalContent: {
     background: 'white',
@@ -898,7 +905,7 @@ const styles = {
     borderRadius: '20px',
     width: '600px',
     boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-    animation: 'emerge 0.3s ease-out', 
+    animation: 'emerge 0.3s ease-out', // You can add this @keyframes in your CSS
   },
   modalHeader: {
     display: 'flex',
@@ -927,7 +934,7 @@ const styles = {
   },
   formRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr', 
+    gridTemplateColumns: '1fr 1fr', // Crea las 2 columnas iguales
     gap: '15px',
   },
   inputGroup: {

@@ -20,6 +20,8 @@ const MedicamentosPage = () => {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mostrarTour, setMostrarTour] = useState(false);
+  const [analizandoFormula, setAnalizandoFormula] = useState(false);
+  const [formulaMensaje, setFormulaMensaje] = useState('');
   const [newMedication, setNewMedication] = useState({
     nombre: '',
     descripcion: '',
@@ -322,11 +324,97 @@ const MedicamentosPage = () => {
                 </div>
               </div>
 
-
               {/* Fila 2: Selectores de Imagen / Drag & Drop */}
               <div style={styles.formRow}>
+                {/* Input 1: Traditional Button Style */}
+                <div style={styles.inputGroup}>
+                  <label style={styles.fieldLabel}>Subir foto formula medica (IA lee la formula)</label>
+                  <div style={styles.fileButtonContainer}>
+                    <input
+                      type="file"
+                      id="fileLateral"
+                      accept="image/*,application/pdf"
+                      disabled={analizandoFormula}
+                      style={{
+                        width: '100%',
+                        height: '40px',
+                        padding: '8px 12px',
+                        border: '2px dashed #ccc',
+                        borderRadius: '8px',
+                        backgroundColor: analizandoFormula ? '#e0e0e0' : '#f9f9f9',
+                        cursor: analizandoFormula ? 'wait' : 'pointer',
+                        fontSize: '14px',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
 
-                {/* Input: Subir foto medicamento */}
+                        setAnalizandoFormula(true);
+                        setFormulaMensaje('Analizando formula con IA...');
+
+                        try {
+                          const token = localStorage.getItem('access_token');
+                          const formData = new FormData();
+                          formData.append('formula', file);
+
+                          const response = await fetch(`${API_URL}/api/gemini/analizar-formula`, {
+                            method: 'POST',
+                            headers: { Authorization: `Bearer ${token}` },
+                            body: formData,
+                          });
+
+                          const result = await response.json();
+
+                          if (result.success && result.data) {
+                            const { nombre, frecuencia_horas, descripcion } = result.data;
+                            const idFrecuencia = FRECUENCIA_MAP[frecuencia_horas] || null;
+
+                            if (isEditMode) {
+                              setEditingMedication({
+                                ...editingMedication,
+                                nombre: nombre || editingMedication.nombre,
+                                descripcion: descripcion || editingMedication.descripcion,
+                                id_frecuencia: idFrecuencia || editingMedication.id_frecuencia,
+                              });
+                            } else {
+                              setNewMedication({
+                                ...newMedication,
+                                nombre: nombre || newMedication.nombre,
+                                descripcion: descripcion || newMedication.descripcion,
+                                id_frecuencia: idFrecuencia || newMedication.id_frecuencia,
+                              });
+                            }
+                            setFormulaMensaje('Formula leida correctamente. Revisa los datos.');
+                          } else {
+                            setFormulaMensaje(result.message || 'No se pudo leer la formula.');
+                          }
+                        } catch (err) {
+                          console.error('Error analizando formula:', err);
+                          setFormulaMensaje('Error al analizar. Ingresa los datos manualmente.');
+                        } finally {
+                          setAnalizandoFormula(false);
+                          setTimeout(() => setFormulaMensaje(''), 5000);
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.target.value = '';
+                      }}
+                    />
+                    {analizandoFormula && (
+                      <div style={{ color: '#0077b6', fontSize: '13px', marginTop: '4px', fontWeight: 'bold' }}>
+                        Analizando formula con IA...
+                      </div>
+                    )}
+                    {formulaMensaje && !analizandoFormula && (
+                      <div style={{ color: formulaMensaje.includes('correctamente') ? '#2d6a4f' : '#d00000', fontSize: '13px', marginTop: '4px' }}>
+                        {formulaMensaje}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Input 2: Traditional Button Style */}
                 <div style={styles.inputGroup}>
                   <label style={styles.fieldLabel}>Subir foto medicamento</label>
                   <div style={styles.fileButtonContainer}>

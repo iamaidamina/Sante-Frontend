@@ -87,9 +87,6 @@ const LoginPage = () => {
 
         if (userId) {
           localStorage.setItem('user_id', String(userId));
-          console.log('[LOGIN] user_id guardado en localStorage:', userId);
-        } else {
-          console.warn('[LOGIN] user_id NO encontrado en la respuesta del backend');
         }
         // 🔵 Forzar reconexión del socket
         socket.disconnect();
@@ -98,8 +95,8 @@ const LoginPage = () => {
         socket.once("connect", () => {
           console.log("Socket conectado:", socket.id);
           if (userId) {
-            socket.emit("join_user_room", `user_${userId}`);
-            console.log("Uniendo usuario a room:", `user_${userId}`);
+            socket.emit("join_user_room", userId);
+            console.log("Uniendo usuario a room:", userId);
           }
         });
         navigate('/medicamentos');
@@ -175,7 +172,7 @@ const LoginPage = () => {
                 */}
                 {/* NEW: Forgot Password Link */}
                 <div style={styles.forgotPasswordContainer}>
-                  {/*<Link to='/registro' className="link-mapa" style={styles.registrationLink}>Registrarse</Link>*/}
+                  <Link to='/registro' className="link-mapa" style={styles.registrationLink}>Registrarse</Link>
                 </div>
               </form>
             </div>

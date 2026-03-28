@@ -139,7 +139,6 @@ const MENU_PRINCIPAL = [
   { id: 'examen', label: 'Registrar un examen' },
   { id: 'diagnostico', label: 'Acabo de recibir un diagnostico' },
   { id: 'preguntas', label: 'Tengo una pregunta' },
-  { id: 'duda_especifica', label: 'Tengo una duda específica' },
 ];
 
 export default function ChatBotAsistente() {
@@ -154,6 +153,7 @@ export default function ChatBotAsistente() {
   const [campoActual, setCampoActual] = useState('');
   const [especialidades, setEspecialidades] = useState([]);
   const [enviando, setEnviando] = useState(false);
+  const [consultandoGemini, setConsultandoGemini] = useState(false);
   const chatRef = useRef(null);
 
   useEffect(() => {
@@ -214,12 +214,6 @@ export default function ChatBotAsistente() {
       agregarMensajeUsuario('Tengo una pregunta');
       setFlujoActual('preguntas');
       agregarMensajeBot('Selecciona la pregunta que te interesa:');
-    } else if (opcionId === 'duda_especifica') {
-      agregarMensajeUsuario('Tengo una duda específica');
-      setFlujoActual('duda_especifica');
-      agregarMensajeBot('Por favor, escribe tu pregunta específica sobre medicamentos, efectos secundarios, automedicación o sobredosis.');
-      setEsperandoInput(true);
-      setInputTipo('text');
     } else if (opcionId === 'menu') {
       mostrarMenuPrincipal();
     }
@@ -507,32 +501,40 @@ export default function ChatBotAsistente() {
     setFlujoActual('finalizado');
   };
 
-  // --- ENVIAR INPUT ---
-  // Detectar si la pregunta es sobre medicamentos, efectos secundarios, automedicación o sobredosis
-  const esPreguntaGemini = (texto) => {
-    const patrones = [
-      /efectos? secundarios?/i,
-      /automedica(cion|r|do|da)?/i,
-      /sobredosis/i,
-      /qué pasa si tomo/i,
-      /qué pasa si me automedico/i,
-      /qué pasa si tomo sobredosis/i,
-      /interacciones?/i,
-      /puedo mezclar/i,
-      /es peligroso/i,
-      /riesgos?/i,
-      /puedo tomar/i,
-      /puedo consumir/i,
-      /contraindicaciones?/i,
-      /para qué sirve/i,
-      /información de/i,
-      /informacion de/i,
-      /medicamento/i
-    ];
-    return patrones.some((pat) => pat.test(texto));
+  // --- FLUJO GEMINI (pregunta libre) ---
+  const iniciarFlujoGemini = () => {
+    setFlujoActual('gemini');
+    agregarMensajeBot('Escribe tu pregunta sobre salud o medicamentos y te respondere lo mejor que pueda.');
+    setEsperandoInput(true);
+    setCampoActual('pregunta_gemini');
+    setInputTipo('text');
   };
 
-  const enviarInput = async () => {
+  const consultarGemini = async (pregunta) => {
+    setConsultandoGemini(true);
+    setEsperandoInput(false);
+    try {
+      const response = await fetchWithAuth('/api/gemini/chat', {
+        method: 'POST',
+        body: JSON.stringify({ pregunta }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        agregarMensajeBot(data.respuesta);
+      } else if (response.status === 429) {
+        agregarMensajeBot('He alcanzado el limite de consultas por ahora. Intentalo de nuevo en unos minutos.');
+      } else {
+        agregarMensajeBot(data.message || 'No pude obtener una respuesta. Intentalo de nuevo.');
+      }
+    } catch {
+      agregarMensajeBot('Error de conexion. Verifica tu internet e intentalo de nuevo.');
+    }
+    setConsultandoGemini(false);
+    setFlujoActual('finalizado');
+  };
+
+  // --- ENVIAR INPUT ---
+  const enviarInput = () => {
     const valor = inputTexto.trim();
     if (!valor) return;
 
@@ -540,71 +542,14 @@ export default function ChatBotAsistente() {
     setInputTexto('');
     setEsperandoInput(false);
 
-    // Si es pregunta para Gemini, consulta al backend
-    if (esPreguntaGemini(valor)) {
-      agregarMensajeBot('Consultando a Gemini, por favor espera...');
-      setEnviando(true);
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL || 'https://sante-backend-production-a693.up.railway.app'}/api/gemini/chat`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ pregunta: valor })
-          }
-        );
-        const data = await response.json();
-        if (data && data.respuesta) {
-          agregarMensajeBot(data.respuesta);
-        } else {
-          agregarMensajeBot('No se pudo obtener respuesta de Gemini.');
-        }
-      } catch (err) {
-        agregarMensajeBot('Error al consultar Gemini. Intenta de nuevo más tarde.');
-      }
-      setEnviando(false);
-      return;
-    }
-
-    if (flujoActual === 'medicamento') {
+    if (flujoActual === 'gemini') {
+      consultarGemini(valor);
+    } else if (flujoActual === 'medicamento') {
       procesarPasoMedicamento(valor);
     } else if (flujoActual === 'cita') {
       procesarPasoCita(valor);
     } else if (flujoActual === 'examen') {
       procesarPasoExamen(valor);
-    } else if (flujoActual === 'duda_especifica') {
-      // Siempre enviar a Gemini
-      agregarMensajeBot('Consultando a Gemini, por favor espera...');
-      setEnviando(true);
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL || 'https://sante-backend-production-a693.up.railway.app'}/api/gemini/chat`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ pregunta: valor })
-          }
-        );
-        const data = await response.json();
-        if (data && data.respuesta) {
-          agregarMensajeBot(data.respuesta);
-        } else {
-          agregarMensajeBot('No se pudo obtener respuesta de Gemini.');
-        }
-      } catch (err) {
-        agregarMensajeBot('Error al consultar Gemini. Intenta de nuevo más tarde.');
-      }
-      setEnviando(false);
-      setFlujoActual('finalizado');
-      return;
     }
   };
 
@@ -673,9 +618,26 @@ export default function ChatBotAsistente() {
               {pf.pregunta}
             </button>
           ))}
+          <button onClick={() => {
+            agregarMensajeUsuario('Tengo otra pregunta');
+            iniciarFlujoGemini();
+          }} style={styles.botonOpcion}>
+            Tengo otra pregunta
+          </button>
           <button onClick={() => seleccionarOpcion('menu')} style={styles.botonSecundario}>
             Volver al menu
           </button>
+        </div>
+      );
+    }
+
+    // Gemini - consultando
+    if (flujoActual === 'gemini' && consultandoGemini) {
+      return (
+        <div style={styles.botonesContainer}>
+          <div style={{ ...styles.burbujaBot, textAlign: 'center', color: '#64748b', fontStyle: 'italic' }}>
+            Consultando...
+          </div>
         </div>
       );
     }
@@ -883,7 +845,7 @@ export default function ChatBotAsistente() {
                 value={inputTexto}
                 onChange={(e) => setInputTexto(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Escribe tu respuesta..."
+                placeholder={flujoActual === 'gemini' ? 'Escribe tu pregunta...' : 'Escribe tu respuesta...'}
                 style={styles.inputTexto}
                 aria-label="Escribe tu respuesta"
                 autoFocus
