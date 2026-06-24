@@ -46,7 +46,7 @@ const LoginPage = () => {
     e.preventDefault();
     const data = { email, password };
     try {
-      const response = await fetch("https://sante-backend-production-a693.up.railway.app/api/users/login", {
+      const response = await fetch("https://sante-backend-l81v.onrender.com/api/users/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

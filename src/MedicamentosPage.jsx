@@ -10,7 +10,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import { fetchWithAuth } from "./utils/fetchWithAuth";
 import TourGuia from './components/guia/TourGuia';
 
-const API_URL = "https://sante-backend-production-a693.up.railway.app";
+const API_URL = "https://sante-backend-l81v.onrender.com";
 
 const FRECUENCIA_MAP = { 4: 1, 6: 2, 8: 3, 12: 4, 24: 5 };
 
