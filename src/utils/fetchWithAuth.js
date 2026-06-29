@@ -42,6 +42,7 @@ export async function fetchWithAuth(endpoint, options = {}) {
     const data = await refreshResponse.json();
 
     localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
 
     // Reintentar la petición original
     response = await fetch(`${API_URL}${endpoint}`, {
