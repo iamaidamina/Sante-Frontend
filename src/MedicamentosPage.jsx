@@ -43,13 +43,6 @@ const MedicamentosPage = () => {
   const fetchMedications = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        setError('No token found. Please login again.');
-        setIsLoading(false);
-        return;
-      }
-
       const response = await fetchWithAuth('/api/medications');
 
       if (!response.ok) {
@@ -354,13 +347,12 @@ const MedicamentosPage = () => {
                         setFormulaMensaje('Analizando formula con IA...');
 
                         try {
-                          const token = localStorage.getItem('access_token');
                           const formData = new FormData();
                           formData.append('formula', file);
 
                           const response = await fetch(`${API_URL}/api/gemini/analizar-formula`, {
                             method: 'POST',
-                            headers: { Authorization: `Bearer ${token}` },
+                            credentials: 'include',
                             body: formData,
                           });
 

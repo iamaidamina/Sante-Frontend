@@ -56,13 +56,6 @@ const CitasPage = () => {
   const fetchAppointments = async () => {
     try {
       setIsLoading(true);
-      const accessToken = localStorage.getItem('access_token');
-      if (!accessToken) {
-        setError('No token found. Please login again.');
-        setIsLoading(false);
-        return;
-      }
-
       const response = await fetchWithAuth('/api/appointments');
 
       if (!response.ok) {

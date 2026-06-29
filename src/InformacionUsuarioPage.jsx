@@ -26,23 +26,6 @@ const normalizeDateInput = (dateString) => {
   return date.toISOString().split('T')[0];
 };
 
-const getUserDataFromToken = (token) => {
-  try {
-    const payload = token?.split('.')[1];
-    if (!payload) return {};
-
-    const decoded = JSON.parse(atob(payload));
-
-    return {
-      username: decoded?.username || decoded?.name || decoded?.nombres || 'No disponible',
-      email: decoded?.email || 'No disponible',
-      role: decoded?.role || decoded?.rol || 'Usuario',
-    };
-  } catch {
-    return {};
-  }
-};
-
 export default function InformacionUsuarioPage() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -235,9 +218,6 @@ export default function InformacionUsuarioPage() {
     }
   };
 
-  const accessToken = localStorage.getItem('access_token');
-  const tokenData = getUserDataFromToken(accessToken);
-
   const userInfo = [
     {
       label: 'Nombres',
@@ -251,12 +231,12 @@ export default function InformacionUsuarioPage() {
     },
     {
       label: 'Nombre de usuario',
-      value: userData?.username || localStorage.getItem('username') || tokenData.username || 'No disponible',
+      value: userData?.username || localStorage.getItem('username') || 'No disponible',
       icon: '✍️',
     },
     {
       label: 'Correo electronico',
-      value: userData?.email || localStorage.getItem('email') || tokenData.email || 'No disponible',
+      value: userData?.email || localStorage.getItem('email') || 'No disponible',
       icon: '✉️',
     },
     {
@@ -321,7 +301,7 @@ export default function InformacionUsuarioPage() {
               <section style={styles.heroCard}>
                 <div>
                   <p style={styles.heroEyebrow}>PERFIL</p>
-                  <h2 style={styles.heroTitle}>{userData?.nombres || userData?.username || localStorage.getItem('username') || tokenData.username || 'Usuario'}</h2>
+                  <h2 style={styles.heroTitle}>{userData?.nombres || userData?.username || localStorage.getItem('username') || 'Usuario'}</h2>
                   <p style={styles.heroText}>
                     Desde esta vista puedes revisar los datos completos que el sistema tiene disponibles para tu cuenta autenticada.
                   </p>

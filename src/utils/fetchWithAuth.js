@@ -2,35 +2,20 @@ const API_URL = "https://sante-backend-l81v.onrender.com";
 
 export async function fetchWithAuth(endpoint, options = {}) {
 
-  let accessToken = localStorage.getItem("access_token");
-
   let response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
+    credentials: 'include',
     headers: {
       "Content-Type": "application/json",
-      ...options.headers,
-      Authorization: `Bearer ${accessToken}`
+      ...options.headers
     }
   });
 
-  // Si el token expiró
   if (response.status === 403) {
-
-    const refreshToken = localStorage.getItem("refresh_token");
-
-    if (!refreshToken) {
-      window.location.href = "/";
-      return;
-    }
 
     const refreshResponse = await fetch(`${API_URL}/api/users/refresh-token`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        refresh_token: refreshToken
-      })
+      credentials: 'include'
     });
 
     if (!refreshResponse.ok) {
@@ -39,18 +24,12 @@ export async function fetchWithAuth(endpoint, options = {}) {
       return;
     }
 
-    const data = await refreshResponse.json();
-
-    localStorage.setItem("access_token", data.access_token);
-    localStorage.setItem("refresh_token", data.refresh_token);
-
-    // Reintentar la petición original
     response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
+      credentials: 'include',
       headers: {
         "Content-Type": "application/json",
-        ...options.headers,
-        Authorization: `Bearer ${data.access_token}`
+        ...options.headers
       }
     });
   }

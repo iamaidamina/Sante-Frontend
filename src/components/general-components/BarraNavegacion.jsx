@@ -8,40 +8,29 @@ import Cookies from 'universal-cookie';
 import user from '../../assets/user-icon.png';
 import recurso1 from '../../assets/Logo-sante-sinfondo.svg';
 import socket from '../../socket';
-import { fetchWithAuth } from '../../utils/fetchWithAuth';
-
-const getUsernameFromToken = (token) => {
-  try {
-    const payload = token?.split('.')[1];
-    if (!payload) return null;
-    const decoded = JSON.parse(atob(payload));
-    return decoded?.username || decoded?.name || decoded?.nombres || decoded?.email?.split('@')[0] || null;
-  } catch {
-    return null;
-  }
-};
+const API_URL = "https://sante-backend-l81v.onrender.com";
 
 export default function BarraNavegacion() {
   const cookies = new Cookies();
-  const navigate = useNavigate(); // ✅ FIXED: Now works with import
-  const token = localStorage.getItem('access_token'); // ✅ Use localStorage like login
+  const navigate = useNavigate();
+  const userId = localStorage.getItem('user_id');
   const username =
     cookies.get('username') ||
     localStorage.getItem('username') ||
-    getUsernameFromToken(token) ||
     'Usuario';
 
   useEffect(() => {
-    if (!token) {
+    if (!userId) {
       navigate('/', { replace: true });
     }
-  }, [navigate, token]); // ✅ Added token dependency
+  }, [navigate, userId]);
 
 const cerrarSesion = async () => {
   try {
-    if (token) {
-      await fetchWithAuth('/api/users/logout', {
-        method: 'POST'
+    if (userId) {
+      await fetch(`${API_URL}/api/users/logout`, {
+        method: 'POST',
+        credentials: 'include'
       });
     }
 
@@ -51,10 +40,8 @@ const cerrarSesion = async () => {
 
   socket.disconnect();
 
-  // limpiar almacenamiento
   cookies.remove('token', { path: '/' });
   cookies.remove('username', { path: '/' });
-  localStorage.removeItem('access_token');
   localStorage.removeItem('username');
   localStorage.removeItem('email');
   localStorage.removeItem('user_id');
@@ -62,8 +49,7 @@ const cerrarSesion = async () => {
   navigate('/', { replace: true });
 };
 
-  // ✅ Show loading/protected state
-  if (!token) return null;
+  if (!userId) return null;
 
   return (
     <div className='navbar-tam'>

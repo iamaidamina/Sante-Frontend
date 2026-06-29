@@ -5,17 +5,6 @@ import illustrationLeft from './assets/LogoAgenteVirtual.png'
 import socket from './socket';
 import { Link } from "react-router-dom";
 
-const getUsernameFromToken = (token) => {
-  try {
-    const payload = token?.split('.')[1];
-    if (!payload) return null;
-    const decoded = JSON.parse(atob(payload));
-    return decoded?.username || decoded?.name || decoded?.nombres || decoded?.email?.split('@')[0] || null;
-  } catch {
-    return null;
-  }
-};
-
 const LoginPage = () => {
   // 4. Create internal state
   const [email, setEmail] = useState('');
@@ -51,43 +40,23 @@ const LoginPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(data)
       });
       const result = await response.json().catch(() => ({}));
       if (response.ok) {
-        // Compatibilidad: algunos backends devuelven `token` en lugar de `access_token`.
-        const accessToken = result?.access_token || result?.token;
-        const refreshToken = result?.refresh_token || null;
+        const user = result.user;
+        const username = user?.username || user?.nombres || email.split('@')[0];
+        const userId = user?.id_usuario;
 
-        if (!accessToken) {
-          setLoginError('Respuesta de login invalida: no se recibio access token');
+        if (!userId) {
+          setLoginError('Respuesta de login invalida: no se recibio informacion del usuario');
           return;
         }
 
-        const tokenUsername = getUsernameFromToken(accessToken);
-
-        const username =
-          result?.user?.username ||
-          result?.user?.nombres ||
-          tokenUsername ||
-          email.split('@')[0];
-
-        const userId = result?.user?.id_usuario;
-
-        localStorage.setItem('access_token', accessToken);
-        if (refreshToken) {
-          localStorage.setItem('refresh_token', refreshToken);
-        } else {
-          localStorage.removeItem('refresh_token');
-        }
-        // Mantiene compatibilidad temporal con codigo viejo o sesiones previas.
-        localStorage.setItem('token', accessToken);
         localStorage.setItem('email', email);
         localStorage.setItem('username', username);
-
-        if (userId) {
-          localStorage.setItem('user_id', String(userId));
-        }
+        localStorage.setItem('user_id', String(userId));
         // 🔵 Forzar reconexión del socket
         socket.disconnect();
         socket.connect();
